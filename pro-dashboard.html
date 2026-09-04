@@ -58,6 +58,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
       gap: 1rem;
     }
 
@@ -79,6 +81,13 @@
       display: flex;
       align-items: center;
       gap: 0.35rem;
+    }
+
+    #user-email {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .btn-signout {
@@ -340,6 +349,28 @@
     }
     .modal-actions .btn-cancel { background: transparent; color: var(--text-muted); }
     .modal-actions .btn-confirm { background: var(--accent-blue); color: #fff; }
+
+    /* Responsive tweaks for phones */
+    @media (max-width: 640px) {
+      .container { padding: 0 1rem; }
+      .dash-main { padding: 1.5rem 0 3rem; }
+      .dash-header h1 { font-size: 1.4rem; }
+      .dash-header p { font-size: 0.85rem; margin-bottom: 1rem; }
+      .tab-btn { padding: 0.6rem 0.7rem; font-size: 0.78rem; gap: 0.3rem; }
+      .stat-row { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.5rem; }
+      .calendar-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; }
+      .day-card { min-height: 130px; padding: 0.65rem; }
+      .item-stats { flex-wrap: wrap; row-gap: 0.6rem; justify-content: space-around; }
+      .chart-wrap { height: 180px; }
+      .modal-box { padding: 1.25rem; }
+    }
+
+    @media (max-width: 420px) {
+      #user-email { display: none; }
+      .logo-img { height: 32px; }
+      .item-stat { font-size: 0.68rem; }
+      .geo-row { flex-wrap: wrap; row-gap: 0.5rem; }
+    }
   </style>
 </head>
 <body>
