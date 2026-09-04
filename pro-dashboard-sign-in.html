@@ -163,6 +163,71 @@
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
     }
 
+    /* Password field with visibility toggle */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper .form-input {
+      padding-right: 3rem;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0.35rem;
+      border-radius: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-password:hover {
+      color: var(--accent-blue);
+    }
+
+    /* Inline auth error banner */
+    .auth-error {
+      display: none;
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(220, 38, 38, 0.45);
+      color: #fca5a5;
+      font-size: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    .auth-error.visible {
+      display: block;
+    }
+
+    .auth-error.success {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+
+    .auth-error a {
+      color: #38bdf8;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .form-options {
       display: flex;
       justify-content: space-between;
@@ -277,9 +342,9 @@
       <div class="logo-container">
         <img src="varably_logo_new.png" alt="Varably" class="logo-img">
       </div>
-      <a href="varably_landing_page.html" class="nav-back">
+      <a href="index.html" class="nav-back">
         <span class="material-icons" style="font-size: 18px;">arrow_back</span>
-        Back to Varably
+        Back to Home
       </a>
     </div>
   </header>
@@ -292,25 +357,32 @@
         <p>Manage your business spots, events, and proximity alerts.</p>
       </div>
 
-      <form action="/pro-dashboard.html" method="POST">
+      <form id="signin-form" novalidate>
+        <div id="auth-error" class="auth-error" role="alert"></div>
+
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+          <input type="email" id="email" class="form-input" placeholder="name@company.com" autocomplete="email" required>
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+          <div class="password-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">
+              <span class="material-icons" id="toggle-password-icon" style="font-size: 20px;">visibility</span>
+            </button>
+          </div>
         </div>
 
         <div class="form-options">
           <label class="remember-me">
-            <input type="checkbox" style="accent-color: var(--accent-blue);"> Keep me signed in
+            <input type="checkbox" id="remember-me" checked style="accent-color: var(--accent-blue);"> Keep me signed in
           </label>
-          <a href="#" class="forgot-link">Forgot password?</a>
+          <a href="#" id="forgot-link" class="forgot-link">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+        <button type="submit" id="btn-signin" class="btn-submit">Sign In to Dashboard</button>
       </form>
 
       <!-- Mobile App Account Requirement Callout -->
@@ -334,6 +406,184 @@
       <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Firebase (vaycayauth project) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    // Matches lib/firebase_options.dart (web) in the vaycay_application Flutter app
+    var firebaseConfig = {
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6",
+      measurementId: "G-MNJRMQBK51"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+
+    var form = document.getElementById('signin-form');
+    var emailInput = document.getElementById('email');
+    var passwordInput = document.getElementById('password');
+    var rememberMe = document.getElementById('remember-me');
+    var submitBtn = document.getElementById('btn-signin');
+    var errorBox = document.getElementById('auth-error');
+    var toggleBtn = document.getElementById('toggle-password');
+    var toggleIcon = document.getElementById('toggle-password-icon');
+    var forgotLink = document.getElementById('forgot-link');
+
+    // Detect when this page was reached via the browser back/forward buttons.
+    var isBackNavigation = false;
+    try {
+      var navEntries = performance.getEntriesByType ? performance.getEntriesByType('navigation') : [];
+      if (navEntries.length && navEntries[0].type === 'back_forward') {
+        isBackNavigation = true;
+      }
+    } catch (e) { /* older browsers — ignore */ }
+
+    // True while the submit handler is actively signing in. Prevents the
+    // auth state listener below from signing out (or redirecting around)
+    // the fresh session before the submit handler can navigate away.
+    var isSigningIn = false;
+
+    // Already signed in? Go straight to the dashboard — but only if the user
+    // chose "Keep me signed in" (LOCAL persistence). Session-only users must
+    // sign back in every visit, and users arriving via the browser back
+    // button are signed out for a true fresh start.
+    function hasLocalPersistence() {
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var key = localStorage.key(i);
+          if (key && key.indexOf('firebase:authUser:') === 0) return true;
+        }
+      } catch (e) { /* storage unavailable — treat as session-only */ }
+      return false;
+    }
+
+    auth.onAuthStateChanged(function (user) {
+      if (!user) return;
+      // A sign-in is in progress — the submit handler owns navigation.
+      if (isSigningIn) return;
+      if (isBackNavigation || !hasLocalPersistence()) {
+        auth.signOut();
+      } else {
+        window.location.replace('pro-dashboard.html');
+      }
+    });
+
+    // Password visibility toggle
+    toggleBtn.addEventListener('click', function () {
+      var isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      toggleIcon.textContent = isHidden ? 'visibility_off' : 'visibility';
+      toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      passwordInput.focus();
+    });
+
+    function showMessage(text, isSuccess) {
+      errorBox.textContent = text;
+      errorBox.classList.add('visible');
+      errorBox.classList.toggle('success', !!isSuccess);
+    }
+
+    function clearMessage() {
+      errorBox.classList.remove('visible', 'success');
+      errorBox.textContent = '';
+    }
+
+    // Restore the form to its initial state: clear fields, re-enable the
+    // submit button, and hide the password again.
+    function resetSignInForm() {
+      form.reset();
+      passwordInput.type = 'password';
+      toggleIcon.textContent = 'visibility';
+      toggleBtn.setAttribute('aria-label', 'Show password');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In to Dashboard';
+      clearMessage();
+    }
+
+    // Fires on every page load, including restores from the back/forward
+    // cache (browser back button). Always show a fresh form in that case.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted || isBackNavigation) {
+        resetSignInForm();
+      }
+    });
+
+    function friendlyError(code) {
+      switch (code) {
+        case 'auth/invalid-email': return 'Please enter a valid email address.';
+        case 'auth/missing-password': return 'Please enter your password.';
+        case 'auth/user-disabled': return 'This account has been disabled. Contact support.';
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential': return 'Incorrect email or password.';
+        case 'auth/too-many-requests': return 'Too many failed attempts. Please try again later.';
+        case 'auth/network-request-failed': return 'Network error. Check your connection and try again.';
+        default: return 'Sign-in failed. Please try again.';
+      }
+    }
+
+    // Email/password sign-in via Firebase Auth
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearMessage();
+
+      var email = emailInput.value.trim();
+      var password = passwordInput.value;
+      if (!email || !password) {
+        showMessage('Please enter both your email and password.', false);
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in\u2026';
+      isSigningIn = true;
+
+      // "Keep me signed in" -> persist across sessions; otherwise session-only.
+      auth.setPersistence(rememberMe.checked
+        ? firebase.auth.Auth.Persistence.LOCAL
+        : firebase.auth.Auth.Persistence.SESSION)
+        .then(function () {
+          return auth.signInWithEmailAndPassword(email, password);
+        })
+        .then(function () {
+          window.location.href = 'pro-dashboard.html';
+        })
+        .catch(function (err) {
+          if (!err || !err.handled) {
+            showMessage(friendlyError(err.code), false);
+          }
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In to Dashboard';
+          isSigningIn = false;
+        });
+    });
+
+    // Password reset email
+    forgotLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      clearMessage();
+
+      var email = emailInput.value.trim();
+      if (!email) {
+        showMessage('Enter your email address above, then click "Forgot password?".', false);
+        emailInput.focus();
+        return;
+      }
+
+      auth.sendPasswordResetEmail(email)
+        .then(function () {
+          showMessage('Password reset email sent to ' + email + '. Check your inbox.', true);
+        })
+        .catch(function (err) {
+          showMessage(friendlyError(err.code), false);
+        });
+    });
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varably Pro Dashboard</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121c24;
+      --card-bg: rgba(38, 50, 56, 0.85);
+      --card-bg-solid: #263238;
+      --border-color: rgba(120, 144, 156, 0.35);
+      --primary: #f06836;
+      --accent-blue: #0284c7;
+      --accent-blue-hover: #0369a1;
+      --bluegrey-light: #b0bec5;
+      --text-main: #ffffff;
+      --text-muted: #cfd8dc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(circle at 50% 20%, rgba(240, 104, 54, 0.08) 0%, transparent 60%);
+    }
+
+    /* Header Navigation */
+    .header-nav {
+      width: 100%;
+      background: rgba(120, 144, 156, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-email {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-signout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--accent-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-signout:hover {
+      background: var(--accent-blue-hover);
+    }
+
+    /* Page content */
+    .dash-main {
+      flex: 1;
+      padding: 2rem 0 4rem;
+    }
+
+    .dash-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+    }
+
+    .dash-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .card strong {
+      color: var(--text-main);
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Stat chips */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.9rem;
+      text-align: center;
+    }
+
+    .stat-chip .material-icons { color: var(--accent-blue); font-size: 20px; }
+    .stat-chip .stat-value { font-size: 1.3rem; font-weight: 800; margin: 0.25rem 0; }
+    .stat-chip .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Owned item cards */
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .item-card-top { display: flex; align-items: center; gap: 0.85rem; }
+    .item-thumb {
+      width: 52px; height: 52px; border-radius: 10px; object-fit: cover;
+      background: rgba(255,255,255,0.08); flex-shrink: 0;
+    }
+    .item-title { font-weight: 700; font-size: 0.95rem; }
+    .item-badge {
+      display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem;
+      border-radius: 6px; margin-top: 0.2rem;
+    }
+    .item-badge.spot { background: rgba(2,132,199,0.18); color: #38bdf8; }
+    .item-badge.event { background: rgba(240,146,54,0.18); color: #fb923c; }
+    .item-stats {
+      display: flex; justify-content: space-between; margin-top: 0.75rem;
+      padding-top: 0.75rem; border-top: 1px solid var(--border-color);
+    }
+    .item-stat { text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+    .item-stat .material-icons { font-size: 16px; display: block; margin: 0 auto 2px; color: var(--bluegrey-light); }
+
+    /* Calendar */
+    .calendar-notice {
+      background: rgba(2,132,199,0.12);
+      border: 1px solid rgba(2,132,199,0.4);
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .day-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 150px;
+    }
+
+    .day-card.mine { border-color: var(--accent-blue); }
+    .day-date { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .day-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .day-status { font-size: 0.7rem; font-weight: 700; }
+    .day-status.mine { color: var(--accent-blue); }
+    .day-status.taken { color: var(--bluegrey-light); }
+    .day-title { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .day-price { font-size: 0.7rem; color: var(--bluegrey-light); margin-top: 0.15rem; }
+    .day-empty { text-align: center; color: rgba(255,255,255,0.2); font-size: 1.5rem; }
+
+    .btn-small {
+      width: 100%; border: none; border-radius: 8px; padding: 0.4rem; font-size: 0.75rem;
+      font-weight: 700; cursor: pointer; margin-top: 0.5rem;
+    }
+    .btn-small.book { background: var(--accent-blue); color: #fff; }
+    .btn-small.book:disabled { background: #37474f; color: #78909c; cursor: not-allowed; }
+    .btn-small.cancel { background: transparent; border: 1px solid #ef5350; color: #ef5350; }
+
+    /* Geofencing */
+    .geo-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
+      padding: 0.75rem 1rem; margin-bottom: 0.75rem;
+    }
+    .geo-row.enabled { border-color: rgba(74, 222, 128, 0.4); }
+    .geo-price-tag {
+      display: inline-block; font-size: 0.65rem; color: var(--text-muted);
+      background: rgba(255,255,255,0.08); padding: 0.1rem 0.4rem; border-radius: 6px; margin-top: 0.2rem;
+    }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch-slider {
+      position: absolute; cursor: pointer; inset: 0; background: #455a64;
+      border-radius: 24px; transition: 0.2s;
+    }
+    .switch-slider::before {
+      content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: 0.2s;
+    }
+    .switch input:checked + .switch-slider { background: #22c55e; }
+    .switch input:checked + .switch-slider::before { transform: translateX(20px); }
+    .switch input:disabled + .switch-slider { opacity: 0.5; cursor: not-allowed; }
+
+    /* Analytics */
+    .chart-card {
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px;
+      padding: 1rem; margin-bottom: 1.25rem;
+    }
+    .chart-card h3 { font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .chart-wrap { position: relative; height: 220px; }
+
+    .ctr-card {
+      display: flex; align-items: center; gap: 0.9rem;
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px;
+      padding: 1rem; margin-bottom: 1.25rem;
+    }
+    .ctr-card .material-icons { color: var(--accent-blue); font-size: 28px; }
+    .ctr-value { font-size: 1.1rem; font-weight: 800; }
+    .ctr-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+    .upsell-card {
+      background: linear-gradient(135deg, #0284c7, #075985);
+      border-radius: 16px; padding: 1.25rem;
+    }
+    .upsell-card h3 { margin-bottom: 0.5rem; }
+    .upsell-card p { color: rgba(255,255,255,0.9); font-size: 0.85rem; line-height: 1.5; margin-bottom: 0.9rem; }
+    .upsell-card button {
+      background: #fff; color: #075985; border: none; border-radius: 8px;
+      padding: 0.6rem 1rem; font-weight: 700; cursor: pointer;
+    }
+
+    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
+    .empty-state .material-icons { font-size: 48px; color: rgba(255,255,255,0.15); margin-bottom: 1rem; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      align-items: center; justify-content: center; z-index: 50; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--card-bg-solid); border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 1.5rem; max-width: 380px; width: 100%;
+    }
+    .modal-box h3 { margin-bottom: 1rem; }
+    .modal-box label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; margin-top: 0.9rem; }
+    .modal-box select, .modal-box input {
+      width: 100%; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);
+      background: rgba(18,28,36,0.7); color: #fff; font-size: 0.9rem;
+    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.25rem; }
+    .modal-actions button {
+      padding: 0.55rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none;
+    }
+    .modal-actions .btn-cancel { background: transparent; color: var(--text-muted); }
+    .modal-actions .btn-confirm { background: var(--accent-blue); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header-nav">
+    <div class="container navbar">
+      <img src="varably_logo_new.png" alt="Varably" class="logo-img">
+      <div class="nav-right">
+        <span class="user-email">
+          <span class="material-icons" style="font-size: 18px;">account_circle</span>
+          <span id="user-email"></span>
+        </span>
+        <button type="button" id="btn-signout" class="btn-signout">
+          <span class="material-icons" style="font-size: 18px;">logout</span>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Content -->
+  <main class="dash-main">
+    <div class="container">
+      <div class="dash-header">
+        <h1>Pro Dashboard</h1>
+        <p>Manage your business spots, events, and proximity alerts.</p>
+      </div>
+
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <span class="material-icons">storefront</span>
+        <h3>No claimed spots or events yet</h3>
+        <p>Claim a spot or create an event in the Varably app to unlock the Pro Dashboard.</p>
+      </div>
+
+      <div id="dashboard-body" style="display:none;">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="overview"><span class="material-icons" style="font-size:18px;">storefront</span> My Spots &amp; Events</button>
+          <button class="tab-btn" data-tab="calendar"><span class="material-icons" style="font-size:18px;">calendar_month</span> Notification Calendar</button>
+          <button class="tab-btn" data-tab="geofencing"><span class="material-icons" style="font-size:18px;">location_on</span> Geofencing</button>
+          <button class="tab-btn" data-tab="analytics"><span class="material-icons" style="font-size:18px;">analytics</span> Analytics</button>
+        </div>
+
+        <!-- Overview -->
+        <section class="tab-panel active" id="tab-overview">
+          <div class="stat-row" id="overview-stats"></div>
+          <h3 style="margin-bottom:0.75rem;">My Spots &amp; Events</h3>
+          <div id="overview-list"></div>
+        </section>
+
+        <!-- Calendar -->
+        <section class="tab-panel" id="tab-calendar">
+          <div class="calendar-notice">
+            Only one push notification blast is sold platform-wide per day. Pick an open day below to reserve it for one of
+            your spots or events. Payment will be processed via Stripe once it's connected — for now this reserves your slot.
+          </div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+        </section>
+
+        <!-- Geofencing -->
+        <section class="tab-panel" id="tab-geofencing">
+          <div class="calendar-notice">
+            Send a push notification to users within a half-mile radius of a spot or event. Normally $30/month per spot or
+            event — free while in beta. Billing will be enabled once Stripe is connected.
+          </div>
+          <div id="geofence-list"></div>
+        </section>
+
+        <!-- Analytics -->
+        <section class="tab-panel" id="tab-analytics">
+          <h3 style="margin-bottom:0.25rem;">Reach &amp; Engagement</h3>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Across all your claimed spots and events.</p>
+          <div class="chart-card">
+            <div class="chart-wrap"><canvas id="totals-chart"></canvas></div>
+          </div>
+
+          <h3 style="margin-bottom:0.25rem;">Pro Analytics</h3>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Click-through rate, peak engagement hours, and notification performance.</p>
+          <div id="pro-analytics-locked" class="upsell-card">
+            <h3>Unlock Pro Analytics</h3>
+            <p>Enable geofenced alerts on any spot or event ($30/mo, free during beta) to unlock click-through rates, peak
+              engagement times, and notification performance.</p>
+            <button id="btn-goto-geofencing">Go to Geofencing</button>
+          </div>
+          <div id="pro-analytics-unlocked" style="display:none;">
+            <div class="ctr-card">
+              <span class="material-icons">link</span>
+              <div>
+                <div class="ctr-value" id="ctr-value">0.0% click-through rate</div>
+                <div class="ctr-sub" id="ctr-sub">0 link clicks / 0 appearances</div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Peak Engagement Times</h3>
+              <div class="chart-wrap" id="peak-times-wrap"><canvas id="peak-times-chart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <h3>Notification Performance</h3>
+              <div class="stat-row">
+                <div class="stat-chip"><span class="material-icons">campaign</span><div class="stat-value" id="stat-blasts">0</div><div class="stat-label">Blasts Booked</div></div>
+                <div class="stat-chip"><span class="material-icons">location_on</span><div class="stat-value" id="stat-geofences">0</div><div class="stat-label">Geofenced Spots</div></div>
+              </div>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.75rem; line-height:1.5;">
+                Tap-through / open-rate engagement for blast and geofence notifications will appear here once automated
+                delivery is connected to push notifications.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Book Slot Modal -->
+  <div class="modal-overlay" id="book-modal-overlay">
+    <div class="modal-box">
+      <h3 id="book-modal-title">Book a slot</h3>
+      <label for="book-item-select">Spot or event to promote</label>
+      <select id="book-item-select"></select>
+      <label for="book-price-input">Bid amount (USD)</label>
+      <input type="number" id="book-price-input" min="1" value="10">
+      <div class="modal-actions">
+        <button class="btn-cancel" id="book-modal-cancel">Cancel</button>
+        <button class="btn-confirm" id="book-modal-confirm">Reserve Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="text-align:center; padding:1.5rem; color:var(--bluegrey-light); font-size:0.85rem; border-top:1px solid var(--border-color);">
+    <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+  </footer>
+
+  <!-- Firebase (vaycayauth project) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // Matches lib/firebase_options.dart (web) in the vaycay_application Flutter app
+    var firebaseConfig = {
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6",
+      measurementId: "G-MNJRMQBK51"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+
+    var userEmailSpan = document.getElementById('user-email');
+    var signOutBtn = document.getElementById('btn-signout');
+    var emptyState = document.getElementById('empty-state');
+    var dashboardBody = document.getElementById('dashboard-body');
+
+    var currentUser = null;
+    var ownedItems = [];
+    var slotsUnsubscribe = null;
+
+    // Auth guard: not signed in -> back to the sign-in page.
+    auth.onAuthStateChanged(function (user) {
+      if (!user) {
+        window.location.replace('pro-dashboard-sign-in.html');
+        return;
+      }
+      currentUser = user;
+      userEmailSpan.textContent = user.email || 'Pro user';
+      loadOwnedItems();
+    });
+
+    signOutBtn.addEventListener('click', function () {
+      auth.signOut().then(function () {
+        window.location.replace('pro-dashboard-sign-in.html');
+      });
+    });
+
+    // ---------------------------------------------------------------
+    // Tabs
+    // ---------------------------------------------------------------
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { activateTab(btn.dataset.tab); });
+    });
+    document.getElementById('btn-goto-geofencing').addEventListener('click', function () {
+      activateTab('geofencing');
+    });
+
+    function activateTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tab); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'tab-' + tab); });
+    }
+
+    // ---------------------------------------------------------------
+    // Load owned spots/events
+    // ---------------------------------------------------------------
+    function loadOwnedItems() {
+      var uid = currentUser.uid;
+      Promise.all([
+        db.collection('spots').where('creator', '==', uid).where('isClaimed', '==', true).get(),
+        db.collection('events').where('creator', '==', uid).get()
+      ]).then(function (results) {
+        var items = [];
+        results[0].docs.forEach(function (doc) {
+          if (doc.data().isArchived !== true) items.push(toOwnedItem(doc, 'spots'));
+        });
+        results[1].docs.forEach(function (doc) {
+          if (doc.data().isArchived !== true) items.push(toOwnedItem(doc, 'events'));
+        });
+        ownedItems = items;
+        renderDashboard();
+      }).catch(function (err) {
+        console.error('Failed to load owned spots/events', err);
+      });
+    }
+
+    function toOwnedItem(doc, collectionPath) {
+      var d = doc.data();
+      return {
+        id: doc.id,
+        collectionPath: collectionPath,
+        isEvent: collectionPath === 'events',
+        title: d.title || 'Untitled',
+        imageUrl: d.coverImage || d.imageUrl || '',
+        likesCount: d.likesCount || 0,
+        interestedCount: d.interestedCount || 0,
+        savesCount: d.savesCount || 0,
+        sharesCount: d.sharesCount || 0,
+        viewsCount: d.viewsCount || 0,
+        linkClicksCount: d.linkClicksCount || 0,
+        geofenceEnabled: d.geofenceEnabled === true
+      };
+    }
+
+    function engagementCount(item) { return item.isEvent ? item.interestedCount : item.likesCount; }
+    function docKey(item) { return item.collectionPath + '_' + item.id; }
+
+    function renderDashboard() {
+      if (ownedItems.length === 0) {
+        emptyState.style.display = 'block';
+        dashboardBody.style.display = 'none';
+        return;
+      }
+      emptyState.style.display = 'none';
+      dashboardBody.style.display = 'block';
+      renderOverview();
+      renderCalendar();
+      renderGeofencing();
+      renderAnalytics();
+    }
+
+    function refreshOwnedItems() { loadOwnedItems(); }
+
+    // ---------------------------------------------------------------
+    // Overview tab
+    // ---------------------------------------------------------------
+    function statChipHtml(label, value, icon) {
+      return '<div class="stat-chip"><span class="material-icons">' + icon + '</span>' +
+        '<div class="stat-value">' + value + '</div><div class="stat-label">' + label + '</div></div>';
+    }
+
+    function renderOverview() {
+      var totalViews = ownedItems.reduce(function (s, i) { return s + i.viewsCount; }, 0);
+      var totalSaves = ownedItems.reduce(function (s, i) { return s + i.savesCount; }, 0);
+      var totalShares = ownedItems.reduce(function (s, i) { return s + i.sharesCount; }, 0);
+
+      document.getElementById('overview-stats').innerHTML =
+        statChipHtml('Appearances', totalViews, 'visibility') +
+        statChipHtml('Saves', totalSaves, 'bookmark') +
+        statChipHtml('Shares', totalShares, 'share');
+
+      document.getElementById('overview-list').innerHTML = ownedItems.map(function (item) {
+        var badgeClass = item.isEvent ? 'event' : 'spot';
+        var badgeText = item.isEvent ? 'EVENT' : 'SPOT';
+        var thumb = item.imageUrl
+          ? '<img class="item-thumb" src="' + item.imageUrl + '" onerror="this.style.display=\'none\'">'
+          : '<div class="item-thumb"></div>';
+        return '<div class="item-card">' +
+          '<div class="item-card-top">' + thumb +
+          '<div><div class="item-title">' + escapeHtml(item.title) + '</div>' +
+          '<span class="item-badge ' + badgeClass + '">' + badgeText + '</span>' +
+          (item.geofenceEnabled ? ' <span class="material-icons" style="font-size:14px;color:#4ade80;vertical-align:middle;">location_on</span>' : '') +
+          '</div></div>' +
+          '<div class="item-stats">' +
+          '<div class="item-stat"><span class="material-icons">visibility</span>' + item.viewsCount + '</div>' +
+          '<div class="item-stat"><span class="material-icons">' + (item.isEvent ? 'event_available' : 'favorite_border') + '</span>' + engagementCount(item) + '</div>' +
+          '<div class="item-stat"><span class="material-icons">bookmark_border</span>' + item.savesCount + '</div>' +
+          '<div class="item-stat"><span class="material-icons">share</span>' + item.sharesCount + '</div>' +
+          '<div class="item-stat"><span class="material-icons">link</span>' + item.linkClicksCount + '</div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Calendar tab (2-week rotating notification slot booking)
+    // ---------------------------------------------------------------
+    function formatDateId(d) {
+      var y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+    function formatDateLabel(d) {
+      return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+    function calendarDates() {
+      var today = new Date(); today.setHours(0, 0, 0, 0);
+      var arr = [];
+      for (var i = 0; i < 14; i++) { var d = new Date(today); d.setDate(today.getDate() + i); arr.push(d); }
+      return arr;
+    }
+
+    function renderCalendar() {
+      var dates = calendarDates();
+      var ids = dates.map(formatDateId);
+      if (slotsUnsubscribe) slotsUnsubscribe();
+      slotsUnsubscribe = db.collection('notification_slots')
+        .where(firebase.firestore.FieldPath.documentId(), 'in', ids)
+        .onSnapshot(function (snapshot) {
+          var byDate = {};
+          snapshot.forEach(function (doc) { byDate[doc.id] = doc.data(); });
+          renderCalendarGrid(dates, ids, byDate);
+        }, function (err) { console.error('Slots stream error', err); });
+    }
+
+    function renderCalendarGrid(dates, ids, byDate) {
+      var grid = document.getElementById('calendar-grid');
+      grid.innerHTML = dates.map(function (date, i) {
+        var id = ids[i];
+        var slot = byDate[id];
+        var isBooked = !!slot;
+        var isMine = isBooked && slot.ownerUid === currentUser.uid;
+        var priceHtml = (isBooked && typeof slot.priceUsd === 'number')
+          ? '<div class="day-price">$' + slot.priceUsd.toFixed(0) + '</div>' : '';
+        var body = isBooked
+          ? '<div class="day-status ' + (isMine ? 'mine' : 'taken') + '">' + (isMine ? 'Booked by you' : 'Slot taken') + '</div>' +
+            '<div class="day-title">' + escapeHtml(slot.title || '') + '</div>' + priceHtml
+          : '<div class="day-empty"><span class="material-icons">add_alert</span></div>';
+        var actionHtml = isMine
+          ? '<button class="btn-small cancel" data-cancel="' + id + '">Cancel</button>'
+          : '<button class="btn-small book" data-book="' + id + '" data-label="' + escapeHtml(formatDateLabel(date)) + '" ' + (isBooked ? 'disabled' : '') + '>' + (isBooked ? 'Unavailable' : 'Book Slot') + '</button>';
+        return '<div class="day-card' + (isMine ? ' mine' : '') + '">' +
+          '<div class="day-date">' + formatDateLabel(date) + '</div>' +
+          '<div class="day-body">' + body + '</div>' + actionHtml + '</div>';
+      }).join('');
+
+      grid.querySelectorAll('[data-book]').forEach(function (btn) {
+        btn.addEventListener('click', function () { openBookModal(btn.dataset.book, btn.dataset.label); });
+      });
+      grid.querySelectorAll('[data-cancel]').forEach(function (btn) {
+        btn.addEventListener('click', function () { cancelSlot(btn.dataset.cancel); });
+      });
+    }
+
+    function cancelSlot(dateId) {
+      db.collection('notification_slots').doc(dateId).delete().catch(function (err) {
+        alert('Could not cancel: ' + err.message);
+      });
+    }
+
+    var bookModalOverlay = document.getElementById('book-modal-overlay');
+    var bookItemSelect = document.getElementById('book-item-select');
+    var bookPriceInput = document.getElementById('book-price-input');
+    var pendingBookDateId = null;
+
+    function openBookModal(dateId, label) {
+      pendingBookDateId = dateId;
+      document.getElementById('book-modal-title').textContent = 'Book ' + label;
+      bookItemSelect.innerHTML = ownedItems.map(function (item, i) {
+        return '<option value="' + i + '">' + escapeHtml(item.title) + '</option>';
+      }).join('');
+      bookPriceInput.value = '10';
+      bookModalOverlay.classList.add('open');
+    }
+
+    document.getElementById('book-modal-cancel').addEventListener('click', function () {
+      bookModalOverlay.classList.remove('open');
+    });
+
+    document.getElementById('book-modal-confirm').addEventListener('click', function () {
+      var item = ownedItems[Number(bookItemSelect.value)];
+      var price = parseFloat(bookPriceInput.value);
+      if (!item || !price || price <= 0) { alert('Enter a valid bid amount.'); return; }
+      bookSlot(pendingBookDateId, item, price);
+    });
+
+    function bookSlot(dateId, item, price) {
+      var ref = db.collection('notification_slots').doc(dateId);
+      db.runTransaction(function (tx) {
+        return tx.get(ref).then(function (snap) {
+          if (snap.exists) throw new Error('That day was just booked by someone else.');
+          tx.set(ref, {
+            ownerUid: currentUser.uid,
+            targetId: item.id,
+            targetType: item.collectionPath,
+            title: item.title,
+            priceUsd: price,
+            purchasedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'booked'
+          });
+        });
+      }).then(function () {
+        bookModalOverlay.classList.remove('open');
+      }).catch(function (err) {
+        alert('Booking failed: ' + err.message);
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Geofencing tab
+    // ---------------------------------------------------------------
+    function renderGeofencing() {
+      var list = document.getElementById('geofence-list');
+      list.innerHTML = ownedItems.map(function (item, i) {
+        return '<div class="geo-row' + (item.geofenceEnabled ? ' enabled' : '') + '">' +
+          '<div><div class="item-title">' + escapeHtml(item.title) + '</div>' +
+          '<span style="font-size:0.75rem;color:var(--bluegrey-light);">' + (item.isEvent ? 'Event' : 'Spot') + '</span> ' +
+          '<span class="geo-price-tag">$30/mo &middot; free in beta</span></div>' +
+          '<label class="switch"><input type="checkbox" data-geo-index="' + i + '" ' + (item.geofenceEnabled ? 'checked' : '') + '><span class="switch-slider"></span></label>' +
+          '</div>';
+      }).join('');
+
+      list.querySelectorAll('[data-geo-index]').forEach(function (input) {
+        input.addEventListener('change', function () {
+          var item = ownedItems[Number(input.dataset.geoIndex)];
+          input.disabled = true;
+          setGeofence(item, input.checked).finally(function () { input.disabled = false; });
+        });
+      });
+    }
+
+    function setGeofence(item, enabled) {
+      var itemRef = db.collection(item.collectionPath).doc(item.id);
+      var subRef = db.collection('geofence_subscriptions').doc(docKey(item));
+      return subRef.get().then(function (existing) {
+        return itemRef.set({ geofenceEnabled: enabled }, { merge: true }).then(function () {
+          var payload = {
+            ownerUid: currentUser.uid,
+            targetId: item.id,
+            targetType: item.collectionPath,
+            title: item.title,
+            status: enabled ? 'active_beta' : 'canceled',
+            priceUsd: 30,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+          if (!existing.exists) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          return subRef.set(payload, { merge: true });
+        });
+      }).then(function () {
+        refreshOwnedItems();
+      }).catch(function (err) {
+        alert('Could not update geofencing: ' + err.message);
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Analytics tab
+    // ---------------------------------------------------------------
+    var totalsChart = null;
+    var peakTimesChart = null;
+
+    function renderAnalytics() {
+      renderTotalsChart();
+
+      db.collection('geofence_subscriptions')
+        .where('ownerUid', '==', currentUser.uid)
+        .where('status', '==', 'active_beta')
+        .get()
+        .then(function (subsSnap) {
+          var isSubscribed = subsSnap.size > 0;
+          document.getElementById('pro-analytics-locked').style.display = isSubscribed ? 'none' : 'block';
+          document.getElementById('pro-analytics-unlocked').style.display = isSubscribed ? 'block' : 'none';
+          if (isSubscribed) renderProAnalytics();
+        });
+    }
+
+    function renderTotalsChart() {
+      var totals = {
+        Views: ownedItems.reduce(function (s, i) { return s + i.viewsCount; }, 0),
+        Likes: ownedItems.filter(function (i) { return !i.isEvent; }).reduce(function (s, i) { return s + i.likesCount; }, 0),
+        Interested: ownedItems.filter(function (i) { return i.isEvent; }).reduce(function (s, i) { return s + i.interestedCount; }, 0),
+        Saves: ownedItems.reduce(function (s, i) { return s + i.savesCount; }, 0),
+        Shares: ownedItems.reduce(function (s, i) { return s + i.sharesCount; }, 0)
+      };
+      var ctx = document.getElementById('totals-chart').getContext('2d');
+      if (totalsChart) totalsChart.destroy();
+      totalsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(totals),
+          datasets: [{ data: Object.values(totals), backgroundColor: '#38bdf8', borderRadius: 4 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#ffffff' }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+          }
+        }
+      });
+    }
+
+    function renderProAnalytics() {
+      var totalViews = ownedItems.reduce(function (s, i) { return s + i.viewsCount; }, 0);
+      var totalClicks = ownedItems.reduce(function (s, i) { return s + i.linkClicksCount; }, 0);
+      var ctr = totalViews === 0 ? 0 : (totalClicks / totalViews) * 100;
+      document.getElementById('ctr-value').textContent = ctr.toFixed(1) + '% click-through rate';
+      document.getElementById('ctr-sub').textContent = totalClicks + ' link clicks / ' + totalViews + ' appearances';
+
+      db.collection('notification_slots').where('ownerUid', '==', currentUser.uid).get().then(function (snap) {
+        document.getElementById('stat-blasts').textContent = snap.size;
+      });
+      document.getElementById('stat-geofences').textContent = ownedItems.filter(function (i) { return i.geofenceEnabled; }).length;
+
+      var ids = ownedItems.map(function (i) { return i.id; }).slice(0, 30);
+      if (ids.length === 0) { renderPeakTimesChart(new Array(24).fill(0)); return; }
+      db.collection('engagement_events').where('targetId', 'in', ids).limit(1000).get().then(function (snap) {
+        var counts = new Array(24).fill(0);
+        snap.forEach(function (doc) {
+          var hour = doc.data().hour;
+          if (typeof hour === 'number' && hour >= 0 && hour < 24) counts[hour]++;
+        });
+        renderPeakTimesChart(counts);
+      });
+    }
+
+    function renderPeakTimesChart(counts) {
+      var wrap = document.getElementById('peak-times-wrap');
+      if (counts.every(function (c) { return c === 0; })) {
+        wrap.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding-top:4rem;">Not enough engagement data yet.</p>';
+        return;
+      }
+      if (!document.getElementById('peak-times-chart')) {
+        wrap.innerHTML = '<canvas id="peak-times-chart"></canvas>';
+      }
+      var ctx = document.getElementById('peak-times-chart').getContext('2d');
+      if (peakTimesChart) peakTimesChart.destroy();
+      peakTimesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: counts.map(function (_, h) { return h + 'h'; }),
+          datasets: [{
+            data: counts, borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.15)',
+            fill: true, tension: 0.35, pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#ffffff', maxTicksLimit: 8 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
