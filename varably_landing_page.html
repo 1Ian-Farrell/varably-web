@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varably | Explore and create memories</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121c24;
+      --card-bg: rgba(38, 50, 56, 0.85);          
+      --card-hover: rgba(55, 71, 79, 0.95);       
+      --border-color: rgba(120, 144, 156, 0.35);   
+      --primary: #f06836;
+      --primary-hover: #d95321;
+      --accent-blue: #0284c7;                     
+      --accent-blue-hover: #0369a1;               
+      --bluegrey-400: #78909c;                    
+      --bluegrey-light: #b0bec5;                
+      --text-main: #ffffff;
+      --text-muted: #cfd8dc;                      
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+
+    .header-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(120, 144, 156, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: default;
+    }
+
+    .logo-img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+      filter: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .btn-download {
+      background: var(--primary);
+      color: white;
+      padding: 0.65rem 1.35rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(240, 104, 54, 0.3);
+      transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-download:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(240, 104, 54, 0.4);
+    }
+
+    .btn-pro {
+      background: linear-gradient(180deg, #2b2b2b 0%, #000000 100%);
+      color: #ffffff;
+      padding: 0.65rem 1.35rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top-color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-pro:hover {
+      background: linear-gradient(180deg, #383838 0%, #0a0a0a 100%);
+      border-color: rgba(255, 255, 255, 0.4);
+      border-top-color: rgba(255, 255, 255, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    }
+
+    .parallax-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      padding: 7rem 0 5rem;
+    }
+
+    .parallax-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 1;
+    }
+
+    .hero-bg {
+      background-image: url('https://images.unsplash.com/photo-1501979376754-2ff867a4f659?auto=format&fit=crop&w=1920&q=80');
+    }
+
+    .about-bg {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Boston_Skyline_from_Fan_Pier.jpg/1920px-Boston_Skyline_from_Fan_Pier.jpg');
+    }
+
+    .download-bg {
+      background-image: url('https://images.unsplash.com/photo-1589401901631-356b7ae2f5d1?q=80&w=1173&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    }
+
+    
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-content h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-content h1 span {
+      color: var(--primary);
+    }
+
+    .hero-content p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .app-badges {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .app-store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: rgba(18, 28, 36, 0.9);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .app-store-badge:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(240, 104, 54, 0.3);
+    }
+
+    .app-store-badge svg {
+      width: 22px;
+      height: 26px;
+      fill: #ffffff;
+    }
+
+    .badge-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .badge-text .small {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--bluegrey-light);
+    }
+
+    .badge-text .big {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .hero-mockup {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone-frame {
+      width: 280px;
+      height: 540px;
+      background: rgba(38, 50, 56, 0.85);
+      backdrop-filter: blur(16px);
+      border: 8px solid var(--border-color);
+      border-radius: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(120, 144, 156, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .phone-frame .frame-logo {
+      height: 54px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7));
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      text-align: center;
+      max-width: 650px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      padding: 2.25rem 1.75rem;
+      border-radius: 16px;
+      transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--primary);
+      background: var(--card-hover);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(240, 104, 54, 0.2);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(240, 104, 54, 0.15);
+      border: 1px solid rgba(240, 104, 54, 0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon svg {
+      width: 26px;
+      height: 26px;
+      fill: var(--primary);
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      color: #ffffff;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .about-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .about-card p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .download-card {
+      background: linear-gradient(135deg, rgba(38, 50, 56, 0.9), rgba(18, 28, 36, 0.92));
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--primary);
+      border-radius: 24px;
+      padding: 4rem 2rem;
+      text-align: center;
+      box-shadow: 0 0 45px rgba(240, 104, 54, 0.25);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .download-card h2 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .download-card p {
+      color: var(--text-muted);
+      margin: 0 auto 2rem;
+      font-size: 1.15rem;
+    }
+
+    .download-card .app-badges {
+      justify-content: center;
+    }
+
+    .footer {
+      background: #0b1217;
+      border-top: 1px solid var(--border-color);
+      padding: 2.5rem 0;
+      text-align: center;
+      color: var(--bluegrey-light);
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .parallax-section {
+        background-attachment: scroll;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+
+      .app-badges {
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-nav">
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo-container">
+          <img src="varably_logo_new.png" alt="Varably" class="logo-img" />
+        </div>
+
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#download">Download</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <a href="pro-dashboard-sign-in.html" class="btn-pro">Pro Dashboard</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section class="parallax-section hero-bg">
+    <div class="parallax-overlay"></div>
+    <div class="container hero">
+      <div class="hero-content">
+        <h1>Discover The Best Spots and Events <span>Near You</span></h1>
+        <p>Explore local experiences, entertainment, nightlife, and events. Plan together with friends and share your experiences.</p>
+
+        <div class="app-badges">
+          <a href="#download" class="app-store-badge">
+            <svg viewBox="0 0 384 512">
+              <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.1-14.3 69.5-34.3z"/>
+            </svg>
+            <div class="badge-text">
+              <span class="small">Download on the</span>
+              <span class="big">App Store</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-mockup">
+        <div class="phone-frame">
+          <img src="varably_logo_new.png" alt="Varably" class="frame-logo" />
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Boston Discovery & Real-Time Alerts</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="parallax-section features-bg">
+    <div class="parallax-overlay"></div>
+    <div class="container">
+      <div class="section-title">
+        <h2>Find Things to Do</h2>
+        <p>Varably keeps you connected to what is happening around you right now.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <h3>Spot and Event Discovery</h3>
+          <p>Find spots and events tailored to your unique preferences and interests.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+          </div>
+          <h3>Proximity Alerts</h3>
+          <p>Get notified when you are near venues offering exclusive deals and live updates.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <span class="material-icons" style="color: var(--primary); font-size: 26px;">hiking</span>
+          </div>
+          <h3>Create Ventures</h3>
+          <p>Create and share itineraries, photo galleries and journal notes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="parallax-section about-bg">
+    <div class="parallax-overlay"></div>
+    <div class="container">
+      <div class="section-title">
+        <h2>About Varably</h2>
+        <p>Connecting people through local experiences.</p>
+      </div>
+      <div class="about-card">
+        <p>Varably was created to help find the perfect places for a day or night out. We focus purely on real-time discovery—notifying you of nearby spots, pop-up events, and special announcements so that you can spend more time creating memories.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="parallax-section download-bg">
+    <div class="parallax-overlay"></div>
+    <div class="container">
+      <div class="download-card">
+        <h2>Get Started with Varably</h2>
+        <p>Available on iOS. Download to explore top spots and events in Boston.</p>
+
+        <div class="app-badges">
+          <a href="#" class="app-store-badge">
+            <svg viewBox="0 0 384 512">
+              <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 52.1-14.3 69.5-34.3z"/>
+            </svg>
+            <div class="badge-text">
+              <span class="small">Download on the</span>
+              <span class="big">App Store</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

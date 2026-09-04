@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varably Pro Dashboard | Sign In</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121c24;
+      --card-bg: rgba(38, 50, 56, 0.85);
+      --border-color: rgba(120, 144, 156, 0.35);
+      --primary: #f06836;
+      --primary-hover: #d95321;
+      --accent-blue: #0284c7;                     /* Light blue accent */
+      --accent-blue-hover: #0369a1;               /* Light blue hover state */
+      --bluegrey-light: #b0bec5;
+      --text-main: #ffffff;
+      --text-muted: #cfd8dc;
+      --info-bg: rgba(2, 132, 199, 0.15);
+      --info-border: rgba(2, 132, 199, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-image: radial-gradient(circle at 50% 20%, rgba(240, 104, 54, 0.08) 0%, transparent 60%);
+    }
+
+    /* Fixed Header Navigation */
+    .header-nav {
+      width: 100%;
+      background: rgba(120, 144, 156, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+
+    .nav-back {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-back:hover {
+      color: var(--primary);
+    }
+
+    /* Main Auth Section */
+    .auth-container {
+      max-width: 460px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .badge-pro {
+      display: inline-block;
+      background: linear-gradient(180deg, #2b2b2b 0%, #000000 100%);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top-color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(18, 28, 36, 0.7);
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--bluegrey-light);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--accent-blue);
+    }
+
+    /* Light Blue Accent Sign In Button */
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-blue);
+      color: #ffffff;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+      transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+    }
+
+    /* Account Requirement Banner */
+    .app-notice-card {
+      margin-top: 1.75rem;
+      padding: 1.25rem;
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+      border-radius: 12px;
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+    }
+
+    .app-notice-card .icon {
+      color: #38bdf8;
+      font-size: 22px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .notice-text h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.3rem;
+    }
+
+    .notice-text p {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 0.75rem;
+    }
+
+    .app-link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .app-link-button:hover {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    .footer {
+      background: #0b1217;
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem 0;
+      text-align: center;
+      color: var(--bluegrey-light);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header-nav">
+    <div class="container navbar">
+      <div class="logo-container">
+        <img src="varably_logo_new.png" alt="Varably" class="logo-img">
+      </div>
+      <a href="varably_landing_page.html" class="nav-back">
+        <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+        Back to Varably
+      </a>
+    </div>
+  </header>
+
+  <!-- Sign In Container -->
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Sign In</h1>
+        <p>Manage your business spots, events, and proximity alerts.</p>
+      </div>
+
+      <form action="/pro-dashboard.html" method="POST">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" style="accent-color: var(--accent-blue);"> Keep me signed in
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+      </form>
+
+      <!-- Mobile App Account Requirement Callout -->
+      <div class="app-notice-card">
+        <span class="material-icons icon">info</span>
+        <div class="notice-text">
+          <h4>Don't have a Varably account?</h4>
+          <p>Pro Dashboard access requires an active Varably user account. Please create an account in the Varably mobile app first before signing in here.</p>
+          <a href="index.html#download" class="app-link-button">
+            Download Varably App
+            <span class="material-icons" style="font-size: 14px;">east</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
