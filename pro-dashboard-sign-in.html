@@ -575,7 +575,10 @@
         return;
       }
 
-      auth.sendPasswordResetEmail(email)
+      auth.sendPasswordResetEmail(email, {
+        url: 'https://varably.com/auth-action.html',
+        handleCodeInApp: false
+      })
         .then(function () {
           showMessage('Password reset email sent to ' + email + '. Check your inbox.', true);
         })

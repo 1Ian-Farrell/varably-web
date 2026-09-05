@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varably | Account Action</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121c24;
+      --card-bg: rgba(38, 50, 56, 0.85);
+      --border-color: rgba(120, 144, 156, 0.35);
+      --primary: #f06836;
+      --primary-hover: #d95321;
+      --accent-blue: #0284c7;
+      --accent-blue-hover: #0369a1;
+      --bluegrey-light: #b0bec5;
+      --text-main: #ffffff;
+      --text-muted: #cfd8dc;
+      --info-bg: rgba(2, 132, 199, 0.15);
+      --info-border: rgba(2, 132, 199, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-image: radial-gradient(circle at 50% 20%, rgba(240, 104, 54, 0.08) 0%, transparent 60%);
+    }
+
+    .header-nav {
+      width: 100%;
+      background: rgba(120, 144, 156, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+
+    .nav-back {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-back:hover {
+      color: var(--primary);
+    }
+
+    .auth-container {
+      max-width: 460px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-header .icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .auth-header .icon-circle .material-icons {
+      font-size: 28px;
+      color: #38bdf8;
+    }
+
+    .auth-header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(18, 28, 36, 0.7);
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper .form-input {
+      padding-right: 3rem;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0.35rem;
+      border-radius: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-password:hover {
+      color: var(--accent-blue);
+    }
+
+    .auth-error {
+      display: none;
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(220, 38, 38, 0.45);
+      color: #fca5a5;
+      font-size: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    .auth-error.visible {
+      display: block;
+    }
+
+    .auth-error.success {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-blue);
+      color: #ffffff;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+      transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.25rem;
+      color: var(--bluegrey-light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .btn-link:hover {
+      color: var(--accent-blue);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .footer {
+      background: #0b1217;
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem 0;
+      text-align: center;
+      color: var(--bluegrey-light);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header-nav">
+    <div class="container navbar">
+      <div class="logo-container">
+        <img src="varably_logo_new.png" alt="Varably" class="logo-img">
+      </div>
+      <a href="index.html" class="nav-back">
+        <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+        Back to Home
+      </a>
+    </div>
+  </header>
+
+  <!-- Action Container -->
+  <main class="auth-container">
+    <div class="auth-card">
+
+      <!-- Loading state -->
+      <div id="state-loading" class="auth-header">
+        <div class="spinner"></div>
+        <p>Verifying your request&hellip;</p>
+      </div>
+
+      <!-- Reset password form -->
+      <form id="state-reset-password" novalidate style="display:none;">
+        <div class="auth-header">
+          <div class="icon-circle"><span class="material-icons">lock_reset</span></div>
+          <h1>Reset Your Password</h1>
+          <p id="reset-account-email"></p>
+        </div>
+        <div id="reset-error" class="auth-error" role="alert"></div>
+        <div class="form-group">
+          <label for="new-password">New Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="new-password" class="form-input" placeholder="••••••••" autocomplete="new-password" required minlength="6">
+            <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">
+              <span class="material-icons" id="toggle-password-icon" style="font-size: 20px;">visibility</span>
+            </button>
+          </div>
+        </div>
+        <button type="submit" id="btn-reset-submit" class="btn-submit">Save New Password</button>
+      </form>
+
+      <!-- Email verified success -->
+      <div id="state-verify-success" class="auth-header" style="display:none;">
+        <div class="icon-circle"><span class="material-icons">check_circle</span></div>
+        <h1>Email Verified</h1>
+        <p>Your email address has been verified. You can now return to the Varably app.</p>
+      </div>
+
+      <!-- Password reset success -->
+      <div id="state-reset-success" class="auth-header" style="display:none;">
+        <div class="icon-circle"><span class="material-icons">check_circle</span></div>
+        <h1>Password Updated</h1>
+        <p>Your password has been changed successfully. You can now sign in with your new password.</p>
+      </div>
+
+      <!-- Email recovery success -->
+      <div id="state-recover-success" class="auth-header" style="display:none;">
+        <div class="icon-circle"><span class="material-icons">check_circle</span></div>
+        <h1>Email Restored</h1>
+        <p>Your account email address has been reverted. If you didn't request this change, we recommend resetting your password right away.</p>
+      </div>
+
+      <!-- Generic error -->
+      <div id="state-error" class="auth-header" style="display:none;">
+        <div class="icon-circle"><span class="material-icons">error_outline</span></div>
+        <h1>Link Expired or Invalid</h1>
+        <p id="error-message">This link has expired or has already been used. Please request a new one and try again.</p>
+      </div>
+
+      <a href="pro-dashboard-sign-in.html" class="btn-link">Return to Varably Sign In</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    // Matches lib/firebase_options.dart (web) in the Varably app
+    var firebaseConfig = {
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6",
+      measurementId: "G-MNJRMQBK51"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function showState(id) {
+      ['state-loading', 'state-reset-password', 'state-verify-success', 'state-reset-success', 'state-recover-success', 'state-error']
+        .forEach(function (s) { document.getElementById(s).style.display = (s === id) ? '' : 'none'; });
+    }
+
+    function showError(message) {
+      document.getElementById('error-message').textContent = message || 'This link has expired or has already been used. Please request a new one and try again.';
+      showState('state-error');
+    }
+
+    function friendlyError(code) {
+      switch (code) {
+        case 'auth/expired-action-code': return 'This link has expired. Please request a new one.';
+        case 'auth/invalid-action-code': return 'This link is invalid or has already been used. Please request a new one.';
+        case 'auth/user-disabled': return 'This account has been disabled. Contact support.';
+        case 'auth/user-not-found': return 'We could not find an account for this request.';
+        case 'auth/weak-password': return 'Please choose a stronger password (at least 6 characters).';
+        default: return 'Something went wrong. Please try again.';
+      }
+    }
+
+    var mode = getParam('mode');
+    var oobCode = getParam('oobCode');
+
+    if (!mode || !oobCode) {
+      showError('This link is missing required information.');
+    } else if (mode === 'resetPassword') {
+      auth.verifyPasswordResetCode(oobCode).then(function (email) {
+        document.getElementById('reset-account-email').textContent = 'For ' + email;
+        showState('state-reset-password');
+
+        var passwordInput = document.getElementById('new-password');
+        var toggleBtn = document.getElementById('toggle-password');
+        var toggleIcon = document.getElementById('toggle-password-icon');
+        toggleBtn.addEventListener('click', function () {
+          var isHidden = passwordInput.type === 'password';
+          passwordInput.type = isHidden ? 'text' : 'password';
+          toggleIcon.textContent = isHidden ? 'visibility_off' : 'visibility';
+        });
+
+        document.getElementById('state-reset-password').addEventListener('submit', function (e) {
+          e.preventDefault();
+          var errorBox = document.getElementById('reset-error');
+          errorBox.classList.remove('visible');
+          var submitBtn = document.getElementById('btn-reset-submit');
+          var newPassword = passwordInput.value;
+
+          if (newPassword.length < 6) {
+            errorBox.textContent = 'Password must be at least 6 characters.';
+            errorBox.classList.add('visible');
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving\u2026';
+
+          auth.confirmPasswordReset(oobCode, newPassword).then(function () {
+            showState('state-reset-success');
+          }).catch(function (err) {
+            errorBox.textContent = friendlyError(err.code);
+            errorBox.classList.add('visible');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save New Password';
+          });
+        });
+      }).catch(function (err) {
+        showError(friendlyError(err.code));
+      });
+    } else if (mode === 'verifyEmail') {
+      auth.applyActionCode(oobCode).then(function () {
+        showState('state-verify-success');
+      }).catch(function (err) {
+        showError(friendlyError(err.code));
+      });
+    } else if (mode === 'recoverEmail') {
+      auth.checkActionCode(oobCode).then(function () {
+        return auth.applyActionCode(oobCode);
+      }).then(function () {
+        showState('state-recover-success');
+      }).catch(function (err) {
+        showError(friendlyError(err.code));
+      });
+    } else {
+      showError('Unrecognized request type.');
+    }
+  </script>
+
+</body>
+</html>
