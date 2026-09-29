@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Varably Pro Dashboard | Sign In</title>
+  <link rel="icon" type="image/png" href="Varably_Icon_Blue_Orange.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
@@ -469,9 +470,15 @@
       if (isBackNavigation || !hasLocalPersistence()) {
         auth.signOut();
       } else {
-        window.location.replace('pro-dashboard.html');
+        window.location.replace(postSignInPage());
       }
     });
+
+    // Only same-site pages on this list may be used as a post-sign-in target.
+    function postSignInPage() {
+      var next = new URLSearchParams(window.location.search).get('next');
+      return ['pro-dashboard.html', 'varably_payment.html'].indexOf(next) >= 0 ? next : 'pro-dashboard.html';
+    }
 
     // Password visibility toggle
     toggleBtn.addEventListener('click', function () {
@@ -551,7 +558,7 @@
           return auth.signInWithEmailAndPassword(email, password);
         })
         .then(function () {
-          window.location.href = 'pro-dashboard.html';
+          window.location.href = postSignInPage();
         })
         .catch(function (err) {
           if (!err || !err.handled) {

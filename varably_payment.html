@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Varably Pro | Business Packages</title>
+  <link rel="icon" type="image/png" href="Varably_Icon_Blue_Orange.png">
   <style>
     :root {
       --bg-color: #0f172a;
@@ -76,23 +77,114 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
 
-    .card.featured {
-      border-color: var(--primary);
-      box-shadow: 0 0 25px rgba(99, 102, 241, 0.2);
+    .account-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      max-width: 1100px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
     }
 
-    .badge {
-      position: absolute;
-      top: -12px;
-      right: 20px;
-      background: var(--primary);
-      color: white;
+    .account-bar label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-right: 0.5rem;
+    }
+
+    .account-bar .muted {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .account-bar a {
+      color: #a5b4fc;
+    }
+
+    select {
+      background: var(--bg-color);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.95rem;
+      max-width: 100%;
+    }
+
+    .banner {
+      display: none;
+      max-width: 1100px;
+      width: 100%;
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .banner.show { display: block; }
+    .banner.success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.4); }
+    .banner.error { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .banner.info { background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.4); }
+
+    .status-pill {
+      display: inline-block;
       font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 4px 12px;
+      font-weight: 600;
+      padding: 3px 10px;
       border-radius: 9999px;
+      margin-bottom: 1rem;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+    }
+
+    .status-pill.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+    }
+
+    .boost-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .boost-form label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .boost-form select { width: 100%; }
+
+    .price-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 1px solid var(--card-border);
+      padding-top: 0.85rem;
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .price-summary strong {
+      color: var(--text-main);
+      font-size: 1.35rem;
+    }
+
+    .fine-print {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      text-align: center;
     }
 
     .card-title {
@@ -217,6 +309,18 @@
       border-color: transparent;
     }
 
+    .day-slot.mine {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary);
+      cursor: not-allowed;
+    }
+
+    .day-slot.mine .price-label {
+      color: #a5b4fc;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+
     .day-slot.booked {
       background: rgba(239, 68, 68, 0.15);
       border-color: #ef4444;
@@ -278,20 +382,35 @@
 
   <div class="header">
     <h1>Grow Your Business with Varably</h1>
-    <p>Reach local customers right when they are nearby or claim an exclusive citywide spot.</p>
+    <p>Every business gets every tool. Mix and match proximity alerts, citywide blasts, and feed boosts for any spot or event you manage.</p>
+  </div>
+
+  <div id="banner" class="banner" role="status"></div>
+
+  <div class="account-bar">
+    <div id="account-signed-out">
+      <span class="muted">Sign in with your Varably business account to purchase.</span>
+      <a href="pro-dashboard-sign-in.html?next=varably_payment.html">Sign in</a>
+    </div>
+    <div id="account-signed-in" style="display:none;">
+      <label for="listing-select">Promoting</label>
+      <select id="listing-select" aria-label="Spot or event to promote"></select>
+      <span id="no-listings" class="muted" style="display:none;">Claim a spot or create an event in the Varably app to get started.</span>
+    </div>
+    <div class="muted" id="account-email"></div>
   </div>
 
   <div class="pricing-grid">
 
-    <!-- Card 1: Monthly Subscription -->
-    <div class="card featured">
-      <div class="badge">Most Popular</div>
-      <h2 class="card-title">Varably Pro</h2>
+    <!-- Proximity alerts (monthly, per listing) -->
+    <div class="card">
+      <h2 class="card-title">Proximity Alerts</h2>
       <p class="card-subtitle">Automated proximity marketing to engage nearby mobile app users.</p>
 
       <div class="price-tag">
-        $30 <span class="period">/ month</span>
+        $30 <span class="period">/ month per listing</span>
       </div>
+      <span id="geofence-status" class="status-pill">Not active</span>
 
       <ul class="features-list">
         <li>
@@ -300,7 +419,7 @@
         </li>
         <li>
           <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>Pro Analytics Dashboard</strong> — Track impressions, walk-ins, and user engagement metrics.
+          <strong>Pro Analytics Dashboard</strong> — Track impressions, alerts delivered, and user engagement metrics.
         </li>
         <li>
           <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
@@ -308,93 +427,24 @@
         </li>
       </ul>
 
-      <button class="btn">Start Pro Subscription</button>
+      <button class="btn" id="btn-geofence">Start Proximity Alerts</button>
+      <p class="fine-print">Billed monthly. Cancel anytime from the Pro Dashboard.</p>
     </div>
 
     <!-- Card 2: Exclusive Daily Blast -->
     <div class="card">
       <h2 class="card-title">Citywide Blast Notification</h2>
-      <p class="card-subtitle">Dominate Boston for a day. Only 1 notification slot available per day across the entire city.</p>
+      <p class="card-subtitle">Dominate <span id="market-name">Boston</span> for a day. Only 1 notification slot available per day across the entire city.</p>
+      <div id="market-picker" style="display:none; margin-bottom:1rem;">
+        <select id="market-select" aria-label="City"></select>
+      </div>
 
       <div class="schedule-header">
         <h4>14-Day Schedule</h4>
         <span class="rule-notice">Closes 48h in advance</span>
       </div>
 
-      <div class="calendar-grid">
-        <!-- Week 1 -->
-        <div class="day-slot locked">
-          <span class="date-label">Mon</span>
-          <span class="date-num">1</span>
-          <span class="price-label">&lt;48h</span>
-        </div>
-        <div class="day-slot locked">
-          <span class="date-label">Tue</span>
-          <span class="date-num">2</span>
-          <span class="price-label">&lt;48h</span>
-        </div>
-        <div class="day-slot booked">
-          <span class="date-label">Wed</span>
-          <span class="date-num">3</span>
-          <span class="price-label">Taken</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Thu</span>
-          <span class="date-num">4</span>
-          <span class="price-label">$175</span>
-        </div>
-        <div class="day-slot selected">
-          <span class="date-label">Fri</span>
-          <span class="date-num">5</span>
-          <span class="price-label">$350</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Sat</span>
-          <span class="date-num">6</span>
-          <span class="price-label">$350</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Sun</span>
-          <span class="date-num">7</span>
-          <span class="price-label">$175</span>
-        </div>
-
-        <!-- Week 2 -->
-        <div class="day-slot">
-          <span class="date-label">Mon</span>
-          <span class="date-num">8</span>
-          <span class="price-label">$125</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Tue</span>
-          <span class="date-num">9</span>
-          <span class="price-label">$125</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Wed</span>
-          <span class="date-num">10</span>
-          <span class="price-label">$175</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Thu</span>
-          <span class="date-num">11</span>
-          <span class="price-label">$175</span>
-        </div>
-        <div class="day-slot booked">
-          <span class="date-label">Fri</span>
-          <span class="date-num">12</span>
-          <span class="price-label">Taken</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Sat</span>
-          <span class="date-num">13</span>
-          <span class="price-label">$350</span>
-        </div>
-        <div class="day-slot">
-          <span class="date-label">Sun</span>
-          <span class="date-num">14</span>
-          <span class="price-label">$175</span>
-        </div>
+      <div class="calendar-grid" id="calendar-grid">
       </div>
 
       <div class="legend">
@@ -409,10 +459,446 @@
         </div>
       </div>
 
-      <button class="btn">Reserve Selected Day ($350)</button>
+      <button class="btn" id="btn-blast" disabled>Select an available day</button>
+      <p class="fine-print" id="blast-fine-print">Sent at noon local time to Varably users around the city. Refundable until the 48h cutoff.</p>
+    </div>
+
+    <!-- Card 3: Feed Boost (time-boxed) -->
+    <div class="card">
+      <h2 class="card-title">Feed Boost</h2>
+      <p class="card-subtitle">Lift a spot or event higher in nearby users' discovery feeds for a set period of time.</p>
+
+      <div class="price-tag">
+        $2 <span class="period">/ day and up</span>
+      </div>
+      <span id="boost-status" class="status-pill">Not boosted</span>
+
+      <ul class="features-list">
+        <li>
+          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          <strong>Boost Spots &amp; Events</strong> &mdash; Promote any listing you manage, from your storefront to this weekend's event.
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          <strong>You Pick the Window</strong> &mdash; Run a boost for 3, 7, 14, or 30 days. It ends automatically.
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+          <strong>Relevance-Safe Ranking</strong> &mdash; Higher daily amounts earn a bigger lift without burying what's genuinely nearby.
+        </li>
+      </ul>
+
+      <div class="boost-form">
+        <div>
+          <label for="boost-bid">Daily amount</label>
+          <select id="boost-bid"></select>
+        </div>
+        <div>
+          <label for="boost-days">Duration</label>
+          <select id="boost-days"></select>
+        </div>
+      </div>
+      <div class="price-summary">
+        <span>Total</span>
+        <strong id="boost-total">$35.00</strong>
+      </div>
+
+      <button class="btn" id="btn-boost">Boost for $35.00</button>
+      <p class="fine-print">One-time charge. Buying the same daily amount again extends a running boost.</p>
     </div>
 
   </div>
+
+  <!-- Firebase (vaycayauth project) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script>
+    // Matches lib/firebase_options.dart (web) in the vaycay_application Flutter app
+    firebase.initializeApp({
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6",
+      measurementId: "G-MNJRMQBK51"
+    });
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+    var createCheckout = firebase.functions().httpsCallable('createCheckout');
+    var listMarkets = firebase.functions().httpsCallable('listMarkets');
+
+    // Display copy of functions/src/pricing.ts; the server recomputes every charge.
+    var PRICING = {
+      boostBidTiersCents: [200, 500, 1000, 2000],
+      boostDurationDays: [3, 7, 14, 30],
+      blastWindowDays: 14,
+      blastCutoffDays: 2
+    };
+    // Launch market, used until listMarkets responds.
+    var markets = [{ id: 'boston', name: 'Boston', sendHour: 12, blastPricesCents: [17500, 12500, 12500, 17500, 17500, 35000, 35000] }];
+    var market = markets[0];
+    function blastPriceCents(date) {
+      return market.blastPricesCents[date.getDay()];
+    }
+    function slotId(dateIdValue) {
+      return market.id + '_' + dateIdValue;
+    }
+    function sendTimeLabel(hour) {
+      if (hour === 12) return 'noon';
+      return (hour % 12 === 0 ? 12 : hour % 12) + (hour < 12 ? ' AM' : ' PM');
+    }
+
+    var currentUser = null;
+    var listings = [];
+    var slotsByDate = {};
+    var geofenceSubs = {};
+    var selectedDateId = null;
+    var unsubscribers = [];
+
+    var els = {
+      banner: document.getElementById('banner'),
+      signedOut: document.getElementById('account-signed-out'),
+      signedIn: document.getElementById('account-signed-in'),
+      email: document.getElementById('account-email'),
+      listingSelect: document.getElementById('listing-select'),
+      noListings: document.getElementById('no-listings'),
+      geofenceStatus: document.getElementById('geofence-status'),
+      boostStatus: document.getElementById('boost-status'),
+      calendar: document.getElementById('calendar-grid'),
+      boostBid: document.getElementById('boost-bid'),
+      boostDays: document.getElementById('boost-days'),
+      boostTotal: document.getElementById('boost-total'),
+      btnGeofence: document.getElementById('btn-geofence'),
+      btnBlast: document.getElementById('btn-blast'),
+      btnBoost: document.getElementById('btn-boost')
+    };
+
+    function money(cents, decimals) {
+      return '$' + (cents / 100).toFixed(decimals);
+    }
+    function dateId(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function calendarDates() {
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      var dates = [];
+      for (var i = 0; i < PRICING.blastWindowDays; i++) {
+        var d = new Date(today);
+        d.setDate(today.getDate() + i);
+        dates.push(d);
+      }
+      return dates;
+    }
+    function toDate(value) {
+      if (!value) return null;
+      if (typeof value.toDate === 'function') return value.toDate();
+      var parsed = new Date(value);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+    function selectedListing() {
+      return listings[Number(els.listingSelect.value)] || null;
+    }
+    function showBanner(kind, text) {
+      els.banner.className = 'banner show ' + kind;
+      els.banner.textContent = text;
+    }
+    function goSignIn() {
+      window.location.href = 'pro-dashboard-sign-in.html?next=varably_payment.html';
+    }
+
+    // ---- Checkout return from Stripe -------------------------------------
+    (function handleCheckoutReturn() {
+      var params = new URLSearchParams(window.location.search);
+      var result = params.get('checkout');
+      if (result === 'success') {
+        showBanner('success', 'Payment received! Your purchase activates as soon as Stripe confirms it, usually within a few seconds. You can return to the Varably app.');
+      } else if (result === 'canceled') {
+        showBanner('info', 'Checkout canceled. Nothing was charged.');
+      }
+      if (result) window.history.replaceState(null, '', window.location.pathname);
+    })();
+
+    // ---- Auth & data ------------------------------------------------------
+    auth.onAuthStateChanged(function (user) {
+      unsubscribers.forEach(function (fn) { fn(); });
+      unsubscribers = [];
+      currentUser = user;
+      els.signedOut.style.display = user ? 'none' : 'block';
+      els.signedIn.style.display = user ? 'block' : 'none';
+      els.email.textContent = user ? (user.email || '') : '';
+      slotsByDate = {};
+      geofenceSubs = {};
+      if (!user) {
+        subscribeSlots();
+        listings = [];
+        renderAll();
+        return;
+      }
+      loadListings();
+      subscribeSlots();
+      unsubscribers.push(db.collection('geofence_subscriptions')
+        .where('ownerUid', '==', user.uid)
+        .onSnapshot(function (snap) {
+          geofenceSubs = {};
+          snap.forEach(function (doc) { geofenceSubs[doc.id] = doc.data(); });
+          renderGeofence();
+        }, function (err) { console.error('Subscriptions stream error', err); }));
+    });
+
+    var slotsUnsubscribe = null;
+    function subscribeSlots() {
+      if (slotsUnsubscribe) slotsUnsubscribe();
+      slotsUnsubscribe = null;
+      slotsByDate = {};
+      if (!currentUser) return;
+      var ids = calendarDates().map(function (d) { return slotId(dateId(d)); });
+      slotsUnsubscribe = db.collection('notification_slots')
+        .where(firebase.firestore.FieldPath.documentId(), 'in', ids)
+        .onSnapshot(function (snap) {
+          slotsByDate = {};
+          snap.forEach(function (doc) { slotsByDate[doc.data().date || doc.id] = doc.data(); });
+          renderCalendar();
+        }, function (err) { console.error('Slots stream error', err); });
+    }
+
+    function applyMarket(id) {
+      market = markets.filter(function (m) { return m.id === id; })[0] || markets[0];
+      selectedDateId = null;
+      document.getElementById('market-name').textContent = market.name;
+      document.getElementById('blast-fine-print').textContent = 'Sent at ' + sendTimeLabel(market.sendHour) +
+        ' local time to Varably users around ' + market.name + '. Refundable until the 48h cutoff.';
+      subscribeSlots();
+      renderCalendar();
+    }
+
+    var marketSelect = document.getElementById('market-select');
+    marketSelect.addEventListener('change', function () { applyMarket(marketSelect.value); });
+    listMarkets().then(function (result) {
+      var list = (result.data && result.data.markets) || [];
+      if (list.length === 0) return;
+      markets = list;
+      marketSelect.innerHTML = '';
+      markets.forEach(function (m) {
+        var option = document.createElement('option');
+        option.value = m.id;
+        option.textContent = m.name;
+        marketSelect.appendChild(option);
+      });
+      document.getElementById('market-picker').style.display = markets.length > 1 ? 'block' : 'none';
+      applyMarket(market.id);
+    }).catch(function (err) { console.error('Could not load cities', err); });
+
+    function loadListings() {
+      var uid = currentUser.uid;
+      var previous = selectedListing();
+      return Promise.all([
+        db.collection('spots').where('creator', '==', uid).where('isClaimed', '==', true).get(),
+        db.collection('events').where('creator', '==', uid).get()
+      ]).then(function (results) {
+        listings = [];
+        [['spots', results[0]], ['events', results[1]]].forEach(function (pair) {
+          pair[1].forEach(function (doc) {
+            var d = doc.data();
+            if (d.isArchived === true) return;
+            listings.push({ id: doc.id, collectionPath: pair[0], title: d.title || 'Untitled', boost: d.boost || null });
+          });
+        });
+        els.listingSelect.innerHTML = '';
+        listings.forEach(function (item, i) {
+          var option = document.createElement('option');
+          option.value = String(i);
+          option.textContent = (item.collectionPath === 'events' ? 'Event: ' : 'Spot: ') + item.title;
+          if (previous && previous.id === item.id) option.selected = true;
+          els.listingSelect.appendChild(option);
+        });
+        renderAll();
+      }).catch(function (err) {
+        console.error('Failed to load listings', err);
+        showBanner('error', 'Could not load your spots and events. Please refresh.');
+      });
+    }
+
+    els.listingSelect.addEventListener('change', function () {
+      renderGeofence();
+      renderBoost();
+    });
+
+    // ---- Rendering --------------------------------------------------------
+    function renderAll() {
+      var hasListings = listings.length > 0;
+      els.listingSelect.style.display = hasListings ? '' : 'none';
+      els.noListings.style.display = currentUser && !hasListings ? 'inline' : 'none';
+      renderGeofence();
+      renderCalendar();
+      renderBoost();
+    }
+
+    function signedOutLabel(btn) {
+      btn.disabled = false;
+      btn.textContent = 'Sign in to continue';
+    }
+
+    function renderGeofence() {
+      var listing = selectedListing();
+      var sub = listing ? geofenceSubs[listing.collectionPath + '_' + listing.id] : null;
+      var status = sub && sub.status;
+      var active = status === 'active' || status === 'active_beta' || status === 'canceling';
+      els.geofenceStatus.className = 'status-pill' + (active ? ' active' : '');
+      if (!active) {
+        els.geofenceStatus.textContent = 'Not active';
+      } else if (status === 'canceling' && toDate(sub.currentPeriodEnd)) {
+        els.geofenceStatus.textContent = 'Active until ' + toDate(sub.currentPeriodEnd).toLocaleDateString();
+      } else {
+        els.geofenceStatus.textContent = 'Active \u00b7 ' + (sub.deliveredCount || 0) + ' alerts sent';
+      }
+      if (!currentUser) return signedOutLabel(els.btnGeofence);
+      els.btnGeofence.disabled = !listing || (active && status !== 'canceling');
+      els.btnGeofence.textContent = !listing
+        ? 'No listings yet'
+        : status === 'canceling' ? 'Resume Proximity Alerts'
+        : active ? 'Active on this listing' : 'Start Proximity Alerts';
+    }
+
+    function renderCalendar() {
+      var dates = calendarDates();
+      var now = Date.now();
+      els.calendar.innerHTML = '';
+      dates.forEach(function (date, index) {
+        var id = dateId(date);
+        var slot = slotsByDate[id];
+        var holdLive = slot && slot.status === 'held' && toDate(slot.holdExpiresAt) && toDate(slot.holdExpiresAt).getTime() > now;
+        var taken = slot && (slot.status !== 'held' || holdLive);
+        var mine = taken && currentUser && slot.ownerUid === currentUser.uid;
+        var locked = index < PRICING.blastCutoffDays;
+
+        var cell = document.createElement('div');
+        cell.className = 'day-slot' + (locked ? ' locked' : mine ? ' mine' : taken ? ' booked' : id === selectedDateId ? ' selected' : '');
+        var label = locked ? '<48h' : mine ? (slot.status === 'held' ? 'Pending' : 'Yours') : taken ? 'Taken' : money(blastPriceCents(date), 0);
+        [['date-label', date.toLocaleDateString(undefined, { weekday: 'short' })],
+         ['date-num', String(date.getDate())],
+         ['price-label', label]].forEach(function (part) {
+          var span = document.createElement('span');
+          span.className = part[0];
+          span.textContent = part[1];
+          cell.appendChild(span);
+        });
+        if (!locked && !taken) {
+          cell.addEventListener('click', function () {
+            selectedDateId = id;
+            renderCalendar();
+          });
+        }
+        if ((locked || taken) && selectedDateId === id) selectedDateId = null;
+        els.calendar.appendChild(cell);
+      });
+
+      if (!currentUser) {
+        var sel = selectedDateId && dates.filter(function (d) { return dateId(d) === selectedDateId; })[0];
+        els.btnBlast.disabled = false;
+        els.btnBlast.textContent = sel ? 'Sign in to reserve (' + money(blastPriceCents(sel), 0) + ')' : 'Sign in to continue';
+        return;
+      }
+      var selected = selectedDateId && dates.filter(function (d) { return dateId(d) === selectedDateId; })[0];
+      els.btnBlast.disabled = !selected || !selectedListing();
+      els.btnBlast.textContent = selected
+        ? 'Reserve Selected Day (' + money(blastPriceCents(selected), 0) + ')'
+        : 'Select an available day';
+    }
+
+    function renderBoost() {
+      var listing = selectedListing();
+      var boost = listing && listing.boost;
+      var expires = boost && toDate(boost.expiresAt);
+      var boosted = boost && boost.bidCentsPerDay > 0 && expires && expires.getTime() > Date.now();
+      els.boostStatus.className = 'status-pill' + (boosted ? ' active' : '');
+      els.boostStatus.textContent = boosted
+        ? 'Boosted at ' + money(boost.bidCentsPerDay, 2) + '/day until ' + expires.toLocaleDateString()
+        : 'Not boosted';
+
+      var total = Number(els.boostBid.value) * Number(els.boostDays.value);
+      els.boostTotal.textContent = money(total, 2);
+      if (!currentUser) return signedOutLabel(els.btnBoost);
+      els.btnBoost.disabled = !listing;
+      els.btnBoost.textContent = listing ? 'Boost for ' + money(total, 2) : 'No listings yet';
+    }
+
+    PRICING.boostBidTiersCents.forEach(function (cents) {
+      var option = document.createElement('option');
+      option.value = String(cents);
+      option.textContent = money(cents, 2) + ' / day';
+      if (cents === 500) option.selected = true;
+      els.boostBid.appendChild(option);
+    });
+    PRICING.boostDurationDays.forEach(function (days) {
+      var option = document.createElement('option');
+      option.value = String(days);
+      option.textContent = days + ' days';
+      if (days === 7) option.selected = true;
+      els.boostDays.appendChild(option);
+    });
+    els.boostBid.addEventListener('change', renderBoost);
+    els.boostDays.addEventListener('change', renderBoost);
+
+    // ---- Checkout ---------------------------------------------------------
+    function startCheckout(btn, payload, successText) {
+      if (!currentUser) { goSignIn(); return; }
+      var listing = selectedListing();
+      if (!listing) { showBanner('error', 'Pick a spot or event to promote first.'); return; }
+      var label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Starting secure checkout\u2026';
+      createCheckout(Object.assign({
+        targetType: listing.collectionPath,
+        targetId: listing.id,
+        returnUrl: window.location.origin + window.location.pathname
+      }, payload)).then(function (result) {
+        var data = result.data || {};
+        if (data.status === 'requires_payment') {
+          // Only ever hand the browser off to Stripe-hosted checkout.
+          if (typeof data.checkoutUrl === 'string' && data.checkoutUrl.indexOf('https://checkout.stripe.com/') === 0) {
+            window.location.assign(data.checkoutUrl);
+            return;
+          }
+          throw new Error('Unexpected checkout response.');
+        }
+        showBanner('success', successText(listing));
+        selectedDateId = null;
+        loadListings();
+      }).catch(function (err) {
+        showBanner('error', (err && err.message) || 'Checkout failed. Please try again.');
+      }).finally(function () {
+        btn.textContent = label;
+        renderAll();
+      });
+    }
+
+    els.btnGeofence.addEventListener('click', function () {
+      startCheckout(els.btnGeofence, { product: 'geofence' }, function (l) {
+        return 'Proximity alerts are live for ' + l.title + '.';
+      });
+    });
+    els.btnBlast.addEventListener('click', function () {
+      if (!selectedDateId && currentUser) return;
+      startCheckout(els.btnBlast, { product: 'blast', marketId: market.id, date: selectedDateId }, function (l) {
+        return market.name + ' citywide blast booked for ' + l.title + '.';
+      });
+    });
+    els.btnBoost.addEventListener('click', function () {
+      startCheckout(els.btnBoost, {
+        product: 'boost',
+        bidCentsPerDay: Number(els.boostBid.value),
+        days: Number(els.boostDays.value)
+      }, function (l) {
+        return l.title + ' is boosted for ' + els.boostDays.value + ' days.';
+      });
+    });
+
+    renderAll();
+  </script>
 
 </body>
 </html>
