@@ -49,26 +49,34 @@
     const title = values.title.trim();
     if (!title) throw new Error('Title is required.');
     if (!['indoor', 'outdoor', 'both'].includes(values.environment)) throw new Error('Choose a valid environment.');
-    const activities = json(values.activities, 'Activities', true).map(item => {
+    const activities = (Array.isArray(values.activities) ? values.activities : json(values.activities, 'Activities', true)).map(item => {
       if (!item || typeof item.activityName !== 'string' || !item.activityName.trim() ||
           !Array.isArray(item.gear) || !item.gear.every(gear => typeof gear === 'string')) {
         throw new Error('Each activity needs an activityName and a gear array of strings.');
       }
       return { activityName: item.activityName.trim().toLowerCase(), gear: item.gear };
     });
-    const links = json(values.links, 'Links', true).map(item => {
-      if (!item || typeof item.label !== 'string' || typeof item.url !== 'string' ||
-          !/^https?:\/\/\S+$/i.test(item.url.trim())) throw new Error('Each link needs a label and an http(s) URL.');
-      return { label: item.label.trim() || 'Link', url: item.url.trim() };
+    const links = (Array.isArray(values.links) ? values.links : json(values.links, 'Links', true)).map(item => {
+      if (!item || typeof item.label !== 'string' || typeof item.url !== 'string') {
+        throw new Error('Each link needs a label and a valid URL.');
+      }
+      const url = item.url.trim();
+      if (/^[a-z][a-z0-9+.-]*:/i.test(url) && !/^https?:\/\//i.test(url)) {
+        throw new Error('Each link needs a valid website URL.');
+      }
+      const normalizedUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+      if (!/^https?:\/\/\S+$/i.test(normalizedUrl)) throw new Error('Each link needs a valid website URL.');
+      return { label: item.label.trim() || 'Link', url: normalizedUrl };
     });
     const parkingType = Number(values.parking);
     if (![1, 2, 3, 4, 5].includes(parkingType)) throw new Error('Choose a valid parking option.');
+    if (!['Free', '$', '$$', '$$$', '$$$$'].includes(values.costTier)) throw new Error('Choose a valid cost tier.');
     const updates = {
       title, location: values.location.trim(), description: values.description.trim(),
       latitude: coordinate(values.latitude, 90, 'Latitude'), longitude: coordinate(values.longitude, 180, 'Longitude'),
       environment: values.environment, isOutdoors: values.environment !== 'indoor', parkingType,
       cost: { isFree: values.free, tier: values.free ? 'Free' : values.costTier, notes: values.costNotes.trim() },
-      activities, links, isArchived: values.archived,
+      activities, links,
     };
     if ((updates.latitude === null) !== (updates.longitude === null)) throw new Error('Provide both coordinates, or leave both blank.');
     if (type === 'events') {

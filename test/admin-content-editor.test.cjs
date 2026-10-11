@@ -7,9 +7,9 @@ function values(extra = {}) {
     title: 'Title', location: 'Location', description: 'Description',
     latitude: '42', longitude: '-71', environment: 'both', parking: '3',
     free: false, costTier: '$$$$', costNotes: 'Admission',
-    activities: '[{"activityName":"Hiking","gear":["boots"]}]',
-    links: '[{"label":"Website","url":"https://example.test"}]',
-    archived: false, hasHours: true, allDay: false,
+    activities: [{ activityName: 'Hiking', gear: ['boots'] }],
+    links: [{ label: 'Website', url: 'https://example.test' }],
+    hasHours: true, allDay: false,
     schedule: '{"Mon":{"isOpen":true,"openTime":"9:00 AM","closeTime":"5:00 PM"}}',
     date: '2026-10-11', start: '09:00', end: '17:00', repeat: 'Every week',
     customRepeat: '', locationSpot: 'linked-spot', liveFeed: false, ...extra,
@@ -18,7 +18,7 @@ function values(extra = {}) {
 test('web editor writes every owner-editable spot field without rewriting ownership or billing', () => {
   const updates = editor.buildUpdates(values(), 'spots');
   assert.deepEqual(Object.keys(updates).sort(), ['title', 'location', 'description', 'latitude', 'longitude',
-    'environment', 'isOutdoors', 'parkingType', 'cost', 'activities', 'links', 'isArchived', 'hoursOfOperation'].sort());
+    'environment', 'isOutdoors', 'parkingType', 'cost', 'activities', 'links', 'hoursOfOperation'].sort());
   assert.equal(updates.cost.tier, '$$$$');
   assert.deepEqual(updates.activities, [{ activityName: 'hiking', gear: ['boots'] }]);
   assert.equal(updates.hoursOfOperation.schedule.Mon.openTime, '9:00 AM');
@@ -36,8 +36,8 @@ test('web editor includes event date, times, recurrence, linked spot and live fe
 test('invalid fields fail explicitly before any save or upload', () => {
   for (const extra of [
     { title: '' }, { latitude: '91' }, { longitude: '' }, { activities: 'broken' },
-    { activities: '[{"activityName":"hiking","gear":7}]' },
-    { links: '[{"label":"Unsafe","url":"javascript:alert(1)"}]' },
+    { activities: [{ activityName: 'hiking', gear: 7 }] },
+    { links: [{ label: 'Unsafe', url: 'javascript:alert(1)' }] },
     { schedule: '{"Mon":{"isOpen":true,"openTime":"bad","closeTime":"5:00 PM"}}' },
   ]) assert.throws(() => editor.buildUpdates(values(extra), 'spots'));
   for (const extra of [{ date: '2026-02-30' }, { end: '25:00' },

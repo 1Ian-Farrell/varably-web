@@ -20,7 +20,9 @@ Account actions use the existing admin-only Firebase callable functions.
 Firestore rules enforce database access; client-side role checks do not
 replace those rules. Granting admin roles is not exposed in this dashboard.
 Ownership, analytics counters, and billing-managed fields are preserved by the
-content editor. Activities, links, and weekly hours use validated JSON fields.
+content editor. Activities and links use the same add/remove row controls as the website's
+event-creation form; spot hours use weekday and time controls instead of raw
+JSON editing.
 Spot/event galleries are limited to 10 photos including existing and newly
 uploaded photos. Approval rejects additions that would exceed capacity rather
 than silently dropping submitted photos. Existing oversized galleries must be

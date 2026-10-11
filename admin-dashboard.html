@@ -29,16 +29,40 @@
     #notice { padding: 12px 0; white-space: pre-wrap; }
     #notice.error { color: #ffb4ab; }
     #more { margin-top: 16px; }
-    dialog { background: #263238; color: white; border: 1px solid #546e7a; border-radius: 12px; width: min(560px, 95vw); }
+    dialog { background: #121c24; color: white; border: 1px solid #546e7a; border-radius: 16px; width: min(860px, 96vw); max-height: 92vh; padding: 0; }
     dialog::backdrop { background: #0009; }
-    dialog label { display: block; margin: 12px 0; }
-    dialog input, dialog textarea { width: 100%; margin-top: 6px; }
-    dialog input[type="checkbox"], dialog input[type="radio"] { width: auto; }
-    .photo-list { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; }
-    .photo-list figure { flex: 0 0 140px; margin: 0; }
-    .photo-list img { width: 140px; height: 100px; object-fit: cover; border-radius: 8px; }
-    .photo-list button { width: 100%; }
-    small { display: block; color: #cfd8dc; }
+    #edit-form { max-height: 92vh; overflow-y: auto; padding: 24px; }
+    #edit-form h2 { margin: 0 0 6px; font-size: 25px; }
+    #edit-form .lead { margin: 0 0 18px; color: #cfd8dc; }
+    .edit-card { background: rgba(38,50,56,.85); border: 1px solid rgba(120,144,156,.35); border-radius: 14px; padding: 20px; margin: 14px 0; }
+    .edit-card h3 { font-size: 17px; margin: 0 0 16px; }
+    .edit-field { margin-bottom: 16px; }
+    .edit-field:last-child { margin-bottom: 0; }
+    .edit-field > label, .edit-label { display: block; color: #cfd8dc; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+    .edit-field input:not([type=checkbox]):not([type=radio]), .edit-field textarea, .edit-field select,
+    .edit-list-row input, .edit-day input[type=time] { width: 100%; background: rgba(18,28,36,.85); color: white; border: 1px solid rgba(120,144,156,.45); border-radius: 8px; padding: 11px 12px; }
+    .edit-field textarea { min-height: 88px; resize: vertical; }
+    .edit-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .edit-row.three { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .edit-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .edit-chip { border: 1px solid #546e7a; background: rgba(18,28,36,.65); color: #cfd8dc; border-radius: 999px; padding: 8px 14px; }
+    .edit-chip.selected { border-color: #0284c7; background: rgba(2,132,199,.22); color: #fff; }
+    .edit-list-row { display: grid; grid-template-columns: minmax(110px,.65fr) minmax(160px,1.35fr) 48px; gap: 8px; margin: 8px 0; }
+    .edit-list-row.activity { grid-template-columns: minmax(120px,.7fr) minmax(180px,1.3fr) 48px; }
+    .edit-icon-button { padding: 8px; background: #a52632; }
+    .edit-add { padding: 6px 0; border: 0; background: transparent; color: #7dd3fc; min-height: 40px; }
+    .photo-list { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 10px; padding: 8px 0; }
+    .photo-list figure { position: relative; margin: 0; aspect-ratio: 1; border: 2px solid transparent; border-radius: 10px; overflow: hidden; cursor: pointer; }
+    .photo-list figure.selected { border-color: #f06836; }
+    .photo-list img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .photo-list .cover-tag { position: absolute; left: 6px; bottom: 6px; border-radius: 4px; padding: 3px 7px; color: #111; background: #f06836; font-size: 11px; font-weight: 800; }
+    .photo-list .remove-photo { position: absolute; right: 5px; top: 5px; min-height: 32px; padding: 4px 9px; border: 0; border-radius: 50%; background: #111c; }
+    .edit-day { display: grid; grid-template-columns: 24px 60px minmax(110px,1fr) minmax(110px,1fr); gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #ffffff12; }
+    .edit-day input[type=checkbox] { width: 18px; height: 18px; }
+    .edit-toggle { display: flex; align-items: center; gap: 9px; margin: 12px 0; color: #cfd8dc; }
+    .edit-actions { position: sticky; bottom: -24px; background: #121c24; padding: 14px 0 0; }
+    #edit-error { color: #ffb4ab; }
+    @media (max-width: 600px) { #edit-form { padding: 16px; } .edit-row, .edit-row.three { grid-template-columns: 1fr; } .edit-day { grid-template-columns: 22px 42px 1fr 1fr; gap: 5px; } .edit-list-row, .edit-list-row.activity { grid-template-columns: 1fr 44px; } .edit-list-row input:first-child { grid-column: 1; } .edit-list-row input:nth-child(2) { grid-column: 1; } .edit-list-row button { grid-column: 2; grid-row: 1 / span 2; } }
     @media (max-width: 480px) { main { padding: 16px; } header { padding: 16px; } }
   </style>
 </head>
@@ -74,59 +98,66 @@
     </section>
   </main>
   <dialog id="editor">
-    <form id="edit-form">
-      <h2>Edit content</h2>
-      <label>Title<input id="edit-title" required maxlength="500"></label>
-      <label>Location<input id="edit-location" maxlength="1000"></label>
-      <label>Description<textarea id="edit-description" rows="6" maxlength="20000"></textarea></label>
-      <label>Latitude<input id="edit-latitude" type="number" min="-90" max="90" step="any"></label>
-      <label>Longitude<input id="edit-longitude" type="number" min="-180" max="180" step="any"></label>
-      <label>Environment<select id="edit-environment">
-        <option value="outdoor">Outdoors</option><option value="indoor">Indoors</option><option value="both">Both</option>
-      </select></label>
-      <label>Parking<select id="edit-parking">
-        <option value="1">Free lot</option><option value="2">Street parking</option><option value="3">Paid garage</option>
-        <option value="4">No parking</option><option value="5">Parking nearby</option>
-      </select></label>
-      <label><input id="edit-free" type="checkbox"> Free admission</label>
-      <label>Cost tier<select id="edit-cost-tier">
-        <option value="Free">Free</option><option value="$">$</option><option value="$$">$$</option><option value="$$$">$$$</option><option value="$$$$">$$$$</option>
-      </select></label>
-      <label>Cost notes<input id="edit-cost-notes" maxlength="2000"></label>
-      <label>Activities and gear (JSON)<textarea id="edit-activities" rows="5"></textarea>
-        <small>Example: [{"activityName":"hiking","gear":["boots"]}]</small></label>
-      <label>Links (JSON)<textarea id="edit-links" rows="4"></textarea>
-        <small>Example: [{"label":"Website","url":"https://example.com"}]</small></label>
-      <fieldset id="edit-spot-fields">
-        <legend>Spot hours</legend>
-        <label><input id="edit-has-hours" type="checkbox"> Has operating hours</label>
-        <label><input id="edit-24-seven" type="checkbox"> Open 24/7</label>
-        <label>Weekly schedule (JSON)<textarea id="edit-schedule" rows="7"></textarea>
-          <small>Example: {"Mon":{"isOpen":true,"openTime":"9:00 AM","closeTime":"5:00 PM"}}. Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun.</small></label>
-      </fieldset>
-      <fieldset id="edit-event-fields">
-        <legend>Event schedule</legend>
-        <label>Date<input id="edit-date" type="date"></label>
-        <label>Start time<input id="edit-start" type="time"></label>
-        <label>End time<input id="edit-end" type="time"></label>
-        <label>Repeat<select id="edit-repeat">
-          <option>Does not repeat</option><option>Every day</option><option>Every week</option>
-          <option>Every month</option><option>Custom...</option>
-        </select></label>
-        <label>Custom repeat description<input id="edit-custom-repeat" maxlength="1000"></label>
-        <label>Linked spot ID<input id="edit-location-spot" maxlength="200"></label>
-        <label><input id="edit-live-feed" type="checkbox"> Enable live feed</label>
-      </fieldset>
-      <fieldset>
-        <legend>Photos (maximum 10)</legend>
-        <p>Select the cover below. Remove existing photos before adding replacements when at the limit.</p>
+    <form id="edit-form" novalidate>
+      <h2 id="edit-heading">Edit spot</h2>
+      <p class="lead">Update this existing spot or event. Changes are saved to this listing.</p>
+      <section class="edit-card">
+        <h3>Basics</h3>
+        <div class="edit-field"><label for="edit-title">Title <span aria-hidden="true">*</span></label><input id="edit-title" required maxlength="100"></div>
+        <div class="edit-field"><label for="edit-location">Location <span aria-hidden="true">*</span></label><input id="edit-location" maxlength="1000"></div>
+        <div class="edit-row">
+          <div class="edit-field"><label for="edit-latitude">Latitude</label><input id="edit-latitude" type="number" min="-90" max="90" step="any"></div>
+          <div class="edit-field"><label for="edit-longitude">Longitude</label><input id="edit-longitude" type="number" min="-180" max="180" step="any"></div>
+        </div>
+        <div class="edit-field"><label for="edit-description">Description <span class="optional">(optional)</span></label><textarea id="edit-description" rows="4"></textarea></div>
+      </section>
+      <section class="edit-card">
+        <h3>Photos <span aria-hidden="true">*</span></h3>
         <div id="edit-photos" class="photo-list"></div>
-        <label>Add photos<input id="edit-photo-files" type="file" accept="image/*" multiple></label>
-      </fieldset>
-      <label><input id="edit-archived" type="checkbox"> Archived</label>
+        <input type="file" id="edit-photo-files" accept="image/*" multiple hidden>
+        <button type="button" class="edit-add" id="edit-add-photo">+ Add photos</button>
+        <p class="optional">Add up to 10 photos. Select a photo to make it the cover.</p>
+      </section>
+      <section class="edit-card" id="edit-event-fields">
+        <h3>When <span aria-hidden="true">*</span></h3>
+        <div class="edit-row three">
+          <div class="edit-field"><label for="edit-date">Date</label><input id="edit-date" type="date"></div>
+          <div class="edit-field"><label for="edit-start">Start time</label><input id="edit-start" type="time"></div>
+          <div class="edit-field"><label for="edit-end">End time</label><input id="edit-end" type="time"></div>
+        </div>
+        <div class="edit-row">
+          <div class="edit-field"><label for="edit-repeat">Repeats</label><select id="edit-repeat">
+            <option>Does not repeat</option><option>Every day</option><option>Every week</option><option>Every month</option><option value="Custom...">Custom...</option>
+          </select></div>
+          <div class="edit-field" id="edit-custom-repeat-wrap"><label for="edit-custom-repeat">Custom repeat</label><input id="edit-custom-repeat" placeholder="e.g. Every 2 weeks"></div>
+        </div>
+        <label class="edit-toggle"><input id="edit-live-feed" type="checkbox"> Enable live feed</label>
+        <div class="edit-field"><label for="edit-location-spot">Linked spot ID <span class="optional">(optional)</span></label><input id="edit-location-spot" maxlength="200"></div>
+      </section>
+      <section class="edit-card">
+        <h3>Details <span class="optional">(optional)</span></h3>
+        <div class="edit-field"><span class="edit-label">Cost</span><div class="edit-chips" id="edit-cost-chips">
+          <button type="button" class="edit-chip" data-cost="Free">Free</button><button type="button" class="edit-chip" data-cost="$">$</button><button type="button" class="edit-chip" data-cost="$$">$$</button><button type="button" class="edit-chip" data-cost="$$$">$$$</button><button type="button" class="edit-chip" data-cost="$$$$">$$$$</button>
+        </div></div>
+        <div class="edit-field"><label for="edit-cost-notes">Cost notes</label><input id="edit-cost-notes" maxlength="2000" placeholder="e.g. $10 at the door, kids free"></div>
+        <div class="edit-field"><span class="edit-label">Environment</span><div class="edit-chips" id="edit-env-chips">
+          <button type="button" class="edit-chip" data-env="outdoor">Outdoor</button><button type="button" class="edit-chip" data-env="indoor">Indoor</button><button type="button" class="edit-chip" data-env="both">Both</button>
+        </div></div>
+        <div class="edit-field"><span class="edit-label">Parking Availability</span><div class="edit-chips" id="edit-parking-chips">
+          <button type="button" class="edit-chip" data-parking="1">Free Lot</button><button type="button" class="edit-chip" data-parking="2">Street Parking</button><button type="button" class="edit-chip" data-parking="3">Paid Garage</button><button type="button" class="edit-chip" data-parking="4">No Parking</button><button type="button" class="edit-chip" data-parking="5">Unknown</button>
+        </div></div>
+        <div class="edit-field"><span class="edit-label">Activities <span class="optional">(optional)</span></span><div id="edit-activities"></div><button type="button" class="edit-add" id="edit-add-activity">+ Add activity</button></div>
+        <div class="edit-field"><span class="edit-label">Links <span class="optional">(optional)</span></span><div id="edit-links"></div><button type="button" class="edit-add" id="edit-add-link">+ Add link</button></div>
+      </section>
+      <section class="edit-card" id="edit-spot-fields">
+        <h3>Hours of Operation</h3>
+        <label class="edit-toggle"><input id="edit-has-hours" type="checkbox"> This spot has operating hours</label>
+        <label class="edit-toggle"><input id="edit-24-seven" type="checkbox"> Open 24 hours, 7 days a week</label>
+        <div id="edit-schedule"></div>
+      </section>
       <p id="edit-error" role="alert"></p>
-      <div class="actions">
-        <button id="save" type="submit">Save</button>
+      <div class="actions edit-actions">
+        <button id="save" type="submit">Save Changes</button>
         <button id="cancel-edit" type="button">Cancel</button>
       </div>
     </form>

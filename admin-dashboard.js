@@ -19,10 +19,116 @@ let editPhotos = [];
 let editCover = 0;
 let saving = false;
 
-const editFields = ['title', 'location', 'description', 'latitude', 'longitude', 'environment',
-  'parking', 'cost-tier', 'cost-notes', 'activities', 'links', 'schedule', 'date', 'start',
-  'end', 'repeat', 'custom-repeat', 'location-spot'];
-const editChecks = ['free', 'has-hours', '24-seven', 'live-feed', 'archived'];
+const editFields = ['title', 'location', 'description', 'latitude', 'longitude', 'cost-notes',
+  'date', 'start', 'end', 'repeat', 'custom-repeat', 'location-spot'];
+const editChecks = ['has-hours', '24-seven', 'live-feed'];
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+let editCostTier = '$$';
+let editEnvironment = 'outdoor';
+let editParking = 1;
+
+function addEditRow(containerId, kind, values = {}) {
+  const row = document.createElement('div');
+  row.className = `edit-list-row ${kind}`;
+  const first = document.createElement('input');
+  const second = document.createElement('input');
+  first.type = second.type = 'text';
+  if (kind === 'activity') {
+    first.className = 'act-name';
+    second.className = 'act-gear';
+    first.placeholder = 'Activity (e.g. hiking)';
+    second.placeholder = 'Gear to bring, comma separated';
+    first.value = values.activityName || '';
+    second.value = Array.isArray(values.gear) ? values.gear.join(', ') : '';
+  } else {
+    first.className = 'link-label';
+    second.className = 'link-url';
+    second.type = 'url';
+    first.placeholder = 'Label (e.g. Tickets)';
+    second.placeholder = 'Website or https:// link';
+    first.value = values.label || '';
+    second.value = values.url || '';
+  }
+  const remove = text('button', '×');
+  remove.type = 'button';
+  remove.className = 'edit-icon-button';
+  remove.setAttribute('aria-label', 'Remove');
+  remove.addEventListener('click', () => row.remove());
+  row.append(first, second, remove);
+  element(containerId).append(row);
+}
+
+function readActivities() {
+  return Array.from(element('edit-activities').querySelectorAll('.edit-list-row')).map(row => ({
+    activityName: row.querySelector('.act-name').value,
+    gear: row.querySelector('.act-gear').value.split(',').map(value => value.trim()).filter(Boolean),
+  })).filter(activity => activity.activityName.trim());
+}
+
+function readLinks() {
+  return Array.from(element('edit-links').querySelectorAll('.edit-list-row')).map(row => ({
+    label: row.querySelector('.link-label').value,
+    url: row.querySelector('.link-url').value,
+  })).filter(link => link.url.trim());
+}
+
+function renderSchedule(schedule) {
+  const container = element('edit-schedule');
+  container.replaceChildren();
+  days.forEach(day => {
+    const hours = schedule[day] || {};
+    const row = document.createElement('div');
+    row.className = 'edit-day';
+    const open = document.createElement('input');
+    open.type = 'checkbox';
+    open.className = 'day-open';
+    open.checked = hours.isOpen === true;
+    open.setAttribute('aria-label', `${day} open`);
+    const name = text('strong', day);
+    const start = document.createElement('input');
+    start.type = 'time';
+    start.className = 'day-start';
+    start.value = VarablyContentEditor.timeInput(hours.openTime) || '09:00';
+    start.setAttribute('aria-label', `${day} opening time`);
+    const end = document.createElement('input');
+    end.type = 'time';
+    end.className = 'day-end';
+    end.value = VarablyContentEditor.timeInput(hours.closeTime) || '17:00';
+    end.setAttribute('aria-label', `${day} closing time`);
+    [start, end].forEach(input => {
+      input.disabled = !open.checked || element('edit-24-seven').checked;
+    });
+    open.addEventListener('change', () => {
+      start.disabled = end.disabled = !open.checked || element('edit-24-seven').checked;
+    });
+    row.append(open, name, start, end);
+    container.append(row);
+  });
+}
+
+function readSchedule() {
+  return Object.fromEntries(Array.from(element('edit-schedule').children).map(row => {
+    const isOpen = row.querySelector('.day-open').checked;
+    return [row.children[1].textContent, {
+      isOpen,
+      openTime: isOpen ? VarablyContentEditor.appTime(row.querySelector('.day-start').value) : null,
+      closeTime: isOpen ? VarablyContentEditor.appTime(row.querySelector('.day-end').value) : null,
+    }];
+  }));
+}
+
+function syncEditControls() {
+  document.querySelectorAll('#edit-cost-chips .edit-chip').forEach(button =>
+    button.classList.toggle('selected', button.dataset.cost === editCostTier));
+  document.querySelectorAll('#edit-env-chips .edit-chip').forEach(button =>
+    button.classList.toggle('selected', button.dataset.env === editEnvironment));
+  document.querySelectorAll('#edit-parking-chips .edit-chip').forEach(button =>
+    button.classList.toggle('selected', Number(button.dataset.parking) === editParking));
+  element('edit-custom-repeat-wrap').hidden = element('edit-repeat').value !== 'Custom...';
+  element('edit-custom-repeat').disabled = element('edit-custom-repeat-wrap').hidden;
+  element('edit-24-seven').disabled = !element('edit-has-hours').checked;
+  element('edit-schedule').hidden = !element('edit-has-hours').checked || element('edit-24-seven').checked;
+}
 
 function clearPhotoPreviews() {
   editPhotos.forEach(photo => { if (photo.file) URL.revokeObjectURL(photo.preview); });
@@ -46,30 +152,39 @@ function openEditor(doc) {
     environment: data.environment || (data.isOutdoors === false ? 'indoor' : 'outdoor'),
     parking: data.parkingType || 1, 'cost-tier': (data.cost || {}).tier || 'Free',
     'cost-notes': (data.cost || {}).notes || '',
-    activities: JSON.stringify(activities.map(item => typeof item === 'string'
-      ? { activityName: item, gear: [] } : { ...item, gear: item.gear || [] }), null, 2),
-    links: JSON.stringify(data.links || (data.website ? [{ label: 'Website', url: data.website }] : []), null, 2),
-    schedule: JSON.stringify(hours.schedule || data.spotHours || {}, null, 2),
     date: api.dateInput(data.date), start: api.timeInput(data.startTime || data.eventTime), end: api.timeInput(data.endTime),
     repeat: (data.recurrence || {}).repeatOption || 'Does not repeat',
     'custom-repeat': (data.recurrence || {}).customValue || '', 'location-spot': data.locationSpotId || '',
   };
   editFields.forEach(field => { element(`edit-${field}`).value = values[field]; });
+  element('edit-repeat').value = values.repeat;
   if (!element('edit-repeat').value) {
     element('edit-repeat').value = 'Custom...';
     element('edit-custom-repeat').value = values.repeat;
   }
-  element('edit-free').checked = (data.cost || {}).isFree !== false;
+  editCostTier = (data.cost || {}).isFree === true ? 'Free' : (data.cost || {}).tier || '$$';
+  if (!['Free', '$', '$$', '$$$', '$$$$'].includes(editCostTier)) editCostTier = '$$';
+  editEnvironment = data.environment || (data.isOutdoors === false ? 'indoor' : 'outdoor');
+  if (!['indoor', 'outdoor', 'both'].includes(editEnvironment)) editEnvironment = 'outdoor';
+  editParking = Number(data.parkingType) || 1;
   element('edit-has-hours').checked = hours.hasHours ?? data.hasHours ?? false;
   element('edit-24-seven').checked = hours.is24Seven ?? data.is24Seven ?? false;
   element('edit-live-feed').checked = data.enableLiveFeed !== false;
-  element('edit-archived').checked = data.isArchived === true;
+  element('edit-heading').textContent = doc.ref.parent.id === 'events' ? 'Edit event' : 'Edit spot';
   const isEvent = doc.ref.parent.id === 'events';
   element('edit-event-fields').hidden = !isEvent;
   element('edit-spot-fields').hidden = isEvent;
   ['date', 'start', 'end'].forEach(field => { element(`edit-${field}`).required = isEvent; });
   element('edit-error').textContent = '';
   element('edit-photo-files').value = '';
+  element('edit-activities').replaceChildren();
+  element('edit-links').replaceChildren();
+  activities.forEach(item => addEditRow('edit-activities', 'activity',
+    typeof item === 'string' ? { activityName: item, gear: [] } : item));
+  (data.links || (data.website ? [{ label: 'Website', url: data.website }] : []))
+    .forEach(link => addEditRow('edit-links', 'link', link));
+  renderSchedule(hours.schedule || data.spotHours || {});
+  syncEditControls();
   renderEditPhotos();
   element('editor').showModal();
 }
@@ -77,20 +192,15 @@ function openEditor(doc) {
 function renderEditPhotos() {
   element('edit-photos').replaceChildren();
   editPhotos.forEach((photo, index) => {
-    const figure = document.createElement('figure');
     const image = document.createElement('img');
     image.src = photo.preview;
     image.alt = `Photo ${index + 1}`;
-    const label = text('label', index === editCover ? 'Cover photo' : 'Set cover');
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'cover-photo';
-    radio.checked = index === editCover;
-    radio.disabled = saving;
-    radio.addEventListener('change', () => { editCover = index; renderEditPhotos(); });
-    label.append(radio);
-    const remove = text('button', 'Remove photo');
+    const figure = document.createElement('figure');
+    figure.className = index === editCover ? 'selected' : '';
+    const remove = text('button', '×');
     remove.type = 'button';
+    remove.className = 'remove-photo';
+    remove.setAttribute('aria-label', 'Remove photo');
     remove.disabled = saving;
     remove.addEventListener('click', () => {
       if (photo.file) URL.revokeObjectURL(photo.preview);
@@ -98,7 +208,18 @@ function renderEditPhotos() {
       editCover = index === editCover ? 0 : editCover > index ? editCover - 1 : editCover;
       renderEditPhotos();
     });
-    figure.append(image, label, remove);
+    if (index === editCover) {
+      const tag = text('span', 'COVER');
+      tag.className = 'cover-tag';
+      figure.append(tag);
+    }
+    figure.append(image, remove);
+    figure.addEventListener('click', () => {
+      if (saving) return;
+      editCover = index;
+      renderEditPhotos();
+    });
+    remove.addEventListener('click', event => event.stopPropagation());
     element('edit-photos').append(figure);
   });
   element('edit-photo-files').disabled = saving || editPhotos.length >= VarablyContentEditor.maxPhotos;
@@ -115,6 +236,25 @@ element('edit-photo-files').addEventListener('change', event => {
     renderEditPhotos();
   } catch (error) { element('edit-error').textContent = error.message; }
   event.target.value = '';
+});
+element('edit-add-photo').addEventListener('click', () => element('edit-photo-files').click());
+element('edit-add-activity').addEventListener('click', () => addEditRow('edit-activities', 'activity'));
+element('edit-add-link').addEventListener('click', () => addEditRow('edit-links', 'link'));
+document.querySelectorAll('#edit-cost-chips, #edit-env-chips, #edit-parking-chips').forEach(container => {
+  container.addEventListener('click', event => {
+    const button = event.target.closest('.edit-chip');
+    if (!button) return;
+    if (button.dataset.cost) editCostTier = button.dataset.cost;
+    if (button.dataset.env) editEnvironment = button.dataset.env;
+    if (button.dataset.parking) editParking = Number(button.dataset.parking);
+    syncEditControls();
+  });
+});
+element('edit-repeat').addEventListener('change', syncEditControls);
+element('edit-has-hours').addEventListener('change', syncEditControls);
+element('edit-24-seven').addEventListener('change', () => {
+  renderSchedule(readSchedule());
+  syncEditControls();
 });
 element('editor').addEventListener('cancel', event => { if (saving) event.preventDefault(); });
 element('editor').addEventListener('close', clearPhotoPreviews);
@@ -402,11 +542,12 @@ element('edit-form').addEventListener('submit', async event => {
     const values = {};
     editFields.forEach(field => { values[field] = element(`edit-${field}`).value; });
     const updates = VarablyContentEditor.buildUpdates({
-      ...values, parking: values.parking, costTier: values['cost-tier'], costNotes: values['cost-notes'],
+      ...values, parking: editParking, environment: editEnvironment, costTier: editCostTier,
+      costNotes: values['cost-notes'], activities: readActivities(), links: readLinks(),
+      schedule: JSON.stringify(readSchedule()),
       customRepeat: values['custom-repeat'], locationSpot: values['location-spot'],
-      free: element('edit-free').checked, hasHours: element('edit-has-hours').checked,
+      free: editCostTier === 'Free', hasHours: element('edit-has-hours').checked,
       allDay: element('edit-24-seven').checked, liveFeed: element('edit-live-feed').checked,
-      archived: element('edit-archived').checked,
     }, reference.parent.id);
     if (editPhotos.length > VarablyContentEditor.maxPhotos) throw new Error('Remove extra photos. The total limit is 10.');
     if (updates.date) updates.date = firebase.firestore.Timestamp.fromDate(updates.date);

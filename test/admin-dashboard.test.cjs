@@ -10,14 +10,44 @@ const source = fs.readFileSync(path.join(root, 'admin-dashboard.js'), 'utf8');
 function harness() {
   const elements = new Map();
   function node() {
-    return {
+    const item = {
       hidden: false, disabled: false, textContent: '', value: '', children: [],
-      handlers: {}, classList: { toggle() {} },
+      handlers: {}, attributes: {}, className: '', dataset: {},
+      classList: {
+        toggle(name, enabled) {
+          const classes = new Set(item.className.split(/\s+/).filter(Boolean));
+          if (enabled === undefined ? !classes.has(name) : enabled) classes.add(name);
+          else classes.delete(name);
+          item.className = Array.from(classes).join(' ');
+        },
+      },
       addEventListener(type, handler) { this.handlers[type] = handler; },
       replaceChildren() { this.children = []; },
-      append(...children) { this.children.push(...children); },
+      append(...children) { children.forEach(child => { child.parent = this; this.children.push(child); }); },
+      appendChild(child) { this.append(child); return child; },
+      setAttribute(name, value) { this.attributes[name] = value; },
+      remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); },
+      querySelectorAll(selector) {
+        const className = selector.startsWith('.') ? selector.slice(1) : null;
+        const found = [];
+        const visit = parent => parent.children.forEach(child => {
+          if (className && child.className.split(/\s+/).includes(className)) found.push(child);
+          visit(child);
+        });
+        visit(this);
+        return found;
+      },
+      querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
       close() {}, showModal() {},
     };
+    item.click = () => item.handlers.click && item.handlers.click();
+    item.matches = selector => selector.startsWith('.') && item.className.split(/\s+/).includes(selector.slice(1));
+    item.closest = selector => {
+      let current = item;
+      while (current) { if (current.matches(selector)) return current; current = current.parent; }
+      return null;
+    };
+    return item;
   }
   const get = id => {
     if (!elements.has(id)) elements.set(id, node());
@@ -69,7 +99,13 @@ function harness() {
       functions: () => ({ httpsCallable: name => async parameters =>
         writes.push({ name, parameters }) }),
     },
-    document: { getElementById: get, createElement: node, querySelectorAll: () => [] },
+    document: {
+      getElementById: get, createElement: node,
+      querySelectorAll(selector) {
+        const match = /^#([\w-]+)\s+(.+)$/.exec(selector);
+        return match ? get(match[1]).querySelectorAll(match[2]) : [];
+      },
+    },
     window: { location: { replace(url) { redirected = url; } }, confirm: () => true },
     console: { error() {} },
     VarablyContentEditor: require('../admin-content-editor.js'),
@@ -170,12 +206,26 @@ test('the landing page omits the admin link and only the signed-in Pro page can 
   assert.match(fragment, /'admin-dashboard\.html'/);
   const landing = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   assert.doesNotMatch(landing, /href=["']admin-dashboard\.html["']/i);
+  assert.doesNotMatch(landing, /Business Plans/i);
   const proPage = fs.readFileSync(path.join(root, 'pro-dashboard.html'), 'utf8');
   assert.match(proPage, /id="admin-dashboard-link"[^>]*hidden/);
   assert.match(proPage, /auth\.onAuthStateChanged/);
   assert.match(proPage, /snapshot\.data\(\)\.isAdmin !== true/);
   assert.match(proPage, /adminLink\.hidden = true/);
   assert.match(proPage, /adminAccessUnsubscribe\(\)/);
+});
+
+test('editing uses creation-style cards, repeatable rows, chips and weekly hour controls', () => {
+  const html = fs.readFileSync(path.join(root, 'admin-dashboard.html'), 'utf8');
+  assert.match(html, /class="edit-card"[\s\S]*Basics/);
+  assert.match(html, /id="edit-add-activity"/);
+  assert.match(html, /id="edit-add-link"/);
+  assert.match(html, /id="edit-cost-chips"/);
+  assert.match(html, /id="edit-env-chips"/);
+  assert.match(html, /id="edit-parking-chips"/);
+  assert.match(html, /id="edit-schedule"/);
+  assert.doesNotMatch(html, /Activities and gear \(JSON\)|Weekly schedule \(JSON\)/);
+  assert.match(html, /Save Changes/);
 });
 
 test('website labels use Suggested Spot Edits', () => {
@@ -202,8 +252,13 @@ test('admin editor opens full spot fields and saves selected cover without chang
   await actions.children.find(button => button.textContent === 'Edit').handlers.click();
   assert.equal(app.get('edit-spot-fields').hidden, false);
   assert.equal(app.get('edit-event-fields').hidden, true);
-  assert.equal(app.get('edit-cost-tier').value, '$$');
+  assert.equal(app.get('edit-activities').children.length, 1);
+  assert.equal(app.get('edit-links').children.length, 0);
   app.get('edit-title').value = 'Updated';
+  app.get('edit-add-activity').handlers.click();
+  assert.equal(app.get('edit-activities').children.length, 2);
+  app.get('edit-activities').children[1].children[0].value = 'Yoga';
+  app.get('edit-activities').children[1].children[1].value = 'mat, water';
   await app.get('edit-form').handlers.submit({ preventDefault() {} });
   assert.equal(app.writes.length, 1);
   const saved = app.writes[0].data;
@@ -212,6 +267,7 @@ test('admin editor opens full spot fields and saves selected cover without chang
   assert.equal(saved.coverImage, 'cover');
   assert.equal(saved.creator, undefined);
   assert.equal(saved.businessTier, undefined);
+  assert.deepEqual(Array.from(saved.activities).map(activity => activity.activityName), ['hiking', 'yoga']);
   assert.equal(app.get('save').disabled, false);
   assert.equal(app.get('edit-error').textContent, '');
 });
