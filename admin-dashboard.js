@@ -290,6 +290,10 @@ function render() {
         if (!window.confirm(`${data.isArchived ? 'Restore' : 'Archive'} "${data.title || doc.id}"?`)) return false;
         await doc.ref.update({ isArchived: !data.isArchived, updatedAt: timestamp() });
       }, !data.isArchived);
+      action(actions, 'Delete', async () => {
+        if (!window.confirm(`Permanently delete "${data.title || doc.id}"? This cannot be undone.`)) return false;
+        await doc.ref.delete();
+      }, true);
     } else if (tab === 'users') {
       const suspended = data.accountSuspension && data.accountSuspension.active === true;
       card.append(text('p', `${data.email || ''}\n${data.isAdmin === true ? 'Admin' : suspended ? 'Suspended' : 'Active'}`));

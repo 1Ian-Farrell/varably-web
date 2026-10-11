@@ -78,7 +78,8 @@ function harness() {
   vm.runInContext(source, context);
   const settle = () => new Promise(resolve => setImmediate(resolve));
   function record(id, data, collection = 'spot_claims') {
-    const ref = { path: `${collection}/${id}`, parent: { id: collection }, _data: data };
+    const ref = { path: `${collection}/${id}`, parent: { id: collection }, _data: data,
+        delete: async () => writes.push({ deleted: `${collection}/${id}` }) };
     return { id, ref, data: () => data };
   }
   return {
@@ -230,4 +231,22 @@ test('editor rejects overflow and conflicting gallery edits explicitly', async (
   await app.get('edit-form').handlers.submit({ preventDefault() {} });
   assert.equal(app.writes.length, 0);
   assert.match(app.get('edit-error').textContent, /Photos changed/);
+});
+
+test('content deletion is available to admins after confirmation', async () => {
+  const app = harness();
+  vm.runInContext("tab = 'content'", app.context);
+  app.setResult([app.record('event', { title: 'Event' }, 'events')]);
+  app.signIn({ uid: 'admin' });
+  app.role(true);
+  await app.settle();
+  const actions = app.get('records').children[0].children.at(-1);
+  const button = actions.children.find(item => item.textContent === 'Delete');
+  assert.ok(button);
+  app.context.window.confirm = () => false;
+  await button.handlers.click();
+  assert.equal(app.writes.length, 0);
+  app.context.window.confirm = () => true;
+  await button.handlers.click();
+  assert.deepEqual(app.writes, [{ deleted: 'events/event' }]);
 });

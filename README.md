@@ -11,7 +11,7 @@ removes its content if admin access is revoked.
 The dashboard supports pending claim approval/rejection, full owner-equivalent
 content editing (title, location/coordinates, description, activities/gear,
 environment, parking, cost/notes, links, spot hours, event schedule/recurrence,
-linked spot, live feed, photos/cover) and archiving/restoring, account suspension,
+linked spot, live feed, photos/cover) and archiving/restoring/deleting content, account suspension,
 restoration/deletion, report resolution, and suggested spot edit approval/rejection.
 Account actions use the existing admin-only Firebase callable functions.
 Firestore rules enforce database access; client-side role checks do not
