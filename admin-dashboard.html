@@ -33,6 +33,12 @@
     dialog::backdrop { background: #0009; }
     dialog label { display: block; margin: 12px 0; }
     dialog input, dialog textarea { width: 100%; margin-top: 6px; }
+    dialog input[type="checkbox"], dialog input[type="radio"] { width: auto; }
+    .photo-list { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; }
+    .photo-list figure { flex: 0 0 140px; margin: 0; }
+    .photo-list img { width: 140px; height: 100px; object-fit: cover; border-radius: 8px; }
+    .photo-list button { width: 100%; }
+    small { display: block; color: #cfd8dc; }
     @media (max-width: 480px) { main { padding: 16px; } header { padding: 16px; } }
   </style>
 </head>
@@ -73,6 +79,51 @@
       <label>Title<input id="edit-title" required maxlength="500"></label>
       <label>Location<input id="edit-location" maxlength="1000"></label>
       <label>Description<textarea id="edit-description" rows="6" maxlength="20000"></textarea></label>
+      <label>Latitude<input id="edit-latitude" type="number" min="-90" max="90" step="any"></label>
+      <label>Longitude<input id="edit-longitude" type="number" min="-180" max="180" step="any"></label>
+      <label>Environment<select id="edit-environment">
+        <option value="outdoor">Outdoors</option><option value="indoor">Indoors</option><option value="both">Both</option>
+      </select></label>
+      <label>Parking<select id="edit-parking">
+        <option value="1">Free lot</option><option value="2">Street parking</option><option value="3">Paid garage</option>
+        <option value="4">No parking</option><option value="5">Parking nearby</option>
+      </select></label>
+      <label><input id="edit-free" type="checkbox"> Free admission</label>
+      <label>Cost tier<select id="edit-cost-tier">
+        <option value="Free">Free</option><option value="$">$</option><option value="$$">$$</option><option value="$$$">$$$</option><option value="$$$$">$$$$</option>
+      </select></label>
+      <label>Cost notes<input id="edit-cost-notes" maxlength="2000"></label>
+      <label>Activities and gear (JSON)<textarea id="edit-activities" rows="5"></textarea>
+        <small>Example: [{"activityName":"hiking","gear":["boots"]}]</small></label>
+      <label>Links (JSON)<textarea id="edit-links" rows="4"></textarea>
+        <small>Example: [{"label":"Website","url":"https://example.com"}]</small></label>
+      <fieldset id="edit-spot-fields">
+        <legend>Spot hours</legend>
+        <label><input id="edit-has-hours" type="checkbox"> Has operating hours</label>
+        <label><input id="edit-24-seven" type="checkbox"> Open 24/7</label>
+        <label>Weekly schedule (JSON)<textarea id="edit-schedule" rows="7"></textarea>
+          <small>Example: {"Mon":{"isOpen":true,"openTime":"9:00 AM","closeTime":"5:00 PM"}}. Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun.</small></label>
+      </fieldset>
+      <fieldset id="edit-event-fields">
+        <legend>Event schedule</legend>
+        <label>Date<input id="edit-date" type="date"></label>
+        <label>Start time<input id="edit-start" type="time"></label>
+        <label>End time<input id="edit-end" type="time"></label>
+        <label>Repeat<select id="edit-repeat">
+          <option>Does not repeat</option><option>Every day</option><option>Every week</option>
+          <option>Every month</option><option>Custom...</option>
+        </select></label>
+        <label>Custom repeat description<input id="edit-custom-repeat" maxlength="1000"></label>
+        <label>Linked spot ID<input id="edit-location-spot" maxlength="200"></label>
+        <label><input id="edit-live-feed" type="checkbox"> Enable live feed</label>
+      </fieldset>
+      <fieldset>
+        <legend>Photos (maximum 10)</legend>
+        <p>Select the cover below. Remove existing photos before adding replacements when at the limit.</p>
+        <div id="edit-photos" class="photo-list"></div>
+        <label>Add photos<input id="edit-photo-files" type="file" accept="image/*" multiple></label>
+      </fieldset>
+      <label><input id="edit-archived" type="checkbox"> Archived</label>
       <p id="edit-error" role="alert"></p>
       <div class="actions">
         <button id="save" type="submit">Save</button>
@@ -84,6 +135,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
@@ -94,6 +146,7 @@
       appId: "1:894050703795:web:7606e2b23bfaea74bed3c6"
     });
   </script>
+  <script src="admin-content-editor.js"></script>
   <script src="admin-dashboard.js"></script>
 </body>
 </html>

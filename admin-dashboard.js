@@ -14,6 +14,110 @@ let records = [];
 let cursor = null;
 let loading = false;
 let editing = null;
+let editingData = null;
+let editPhotos = [];
+let editCover = 0;
+let saving = false;
+
+const editFields = ['title', 'location', 'description', 'latitude', 'longitude', 'environment',
+  'parking', 'cost-tier', 'cost-notes', 'activities', 'links', 'schedule', 'date', 'start',
+  'end', 'repeat', 'custom-repeat', 'location-spot'];
+const editChecks = ['free', 'has-hours', '24-seven', 'live-feed', 'archived'];
+
+function clearPhotoPreviews() {
+  editPhotos.forEach(photo => { if (photo.file) URL.revokeObjectURL(photo.preview); });
+  editPhotos = [];
+}
+
+function openEditor(doc) {
+  const data = doc.data();
+  const api = VarablyContentEditor;
+  editing = doc.ref;
+  editingData = data;
+  clearPhotoPreviews();
+  editPhotos = api.photoList(data).map(url => ({ url, preview: url }));
+  editCover = Math.max(0, editPhotos.findIndex(photo => photo.url === data.coverImage));
+  const hours = data.hoursOfOperation || {};
+  const activities = Array.isArray(data.activities) ? data.activities :
+    Object.keys(data.activities || {}).map(activityName => ({ activityName, gear: [] }));
+  const values = {
+    title: data.title || '', location: data.location || '', description: data.description || '',
+    latitude: data.latitude == null ? '' : data.latitude, longitude: data.longitude == null ? '' : data.longitude,
+    environment: data.environment || (data.isOutdoors === false ? 'indoor' : 'outdoor'),
+    parking: data.parkingType || 1, 'cost-tier': (data.cost || {}).tier || 'Free',
+    'cost-notes': (data.cost || {}).notes || '',
+    activities: JSON.stringify(activities.map(item => typeof item === 'string'
+      ? { activityName: item, gear: [] } : { ...item, gear: item.gear || [] }), null, 2),
+    links: JSON.stringify(data.links || (data.website ? [{ label: 'Website', url: data.website }] : []), null, 2),
+    schedule: JSON.stringify(hours.schedule || data.spotHours || {}, null, 2),
+    date: api.dateInput(data.date), start: api.timeInput(data.startTime || data.eventTime), end: api.timeInput(data.endTime),
+    repeat: (data.recurrence || {}).repeatOption || 'Does not repeat',
+    'custom-repeat': (data.recurrence || {}).customValue || '', 'location-spot': data.locationSpotId || '',
+  };
+  editFields.forEach(field => { element(`edit-${field}`).value = values[field]; });
+  if (!element('edit-repeat').value) {
+    element('edit-repeat').value = 'Custom...';
+    element('edit-custom-repeat').value = values.repeat;
+  }
+  element('edit-free').checked = (data.cost || {}).isFree !== false;
+  element('edit-has-hours').checked = hours.hasHours ?? data.hasHours ?? false;
+  element('edit-24-seven').checked = hours.is24Seven ?? data.is24Seven ?? false;
+  element('edit-live-feed').checked = data.enableLiveFeed !== false;
+  element('edit-archived').checked = data.isArchived === true;
+  const isEvent = doc.ref.parent.id === 'events';
+  element('edit-event-fields').hidden = !isEvent;
+  element('edit-spot-fields').hidden = isEvent;
+  ['date', 'start', 'end'].forEach(field => { element(`edit-${field}`).required = isEvent; });
+  element('edit-error').textContent = '';
+  element('edit-photo-files').value = '';
+  renderEditPhotos();
+  element('editor').showModal();
+}
+
+function renderEditPhotos() {
+  element('edit-photos').replaceChildren();
+  editPhotos.forEach((photo, index) => {
+    const figure = document.createElement('figure');
+    const image = document.createElement('img');
+    image.src = photo.preview;
+    image.alt = `Photo ${index + 1}`;
+    const label = text('label', index === editCover ? 'Cover photo' : 'Set cover');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'cover-photo';
+    radio.checked = index === editCover;
+    radio.disabled = saving;
+    radio.addEventListener('change', () => { editCover = index; renderEditPhotos(); });
+    label.append(radio);
+    const remove = text('button', 'Remove photo');
+    remove.type = 'button';
+    remove.disabled = saving;
+    remove.addEventListener('click', () => {
+      if (photo.file) URL.revokeObjectURL(photo.preview);
+      editPhotos.splice(index, 1);
+      editCover = index === editCover ? 0 : editCover > index ? editCover - 1 : editCover;
+      renderEditPhotos();
+    });
+    figure.append(image, label, remove);
+    element('edit-photos').append(figure);
+  });
+  element('edit-photo-files').disabled = saving || editPhotos.length >= VarablyContentEditor.maxPhotos;
+}
+
+element('edit-photo-files').addEventListener('change', event => {
+  if (saving) return;
+  const files = Array.from(event.target.files || []);
+  try {
+    if (editPhotos.length + files.length > VarablyContentEditor.maxPhotos) throw new Error('Choose fewer photos. The total limit is 10.');
+    if (files.some(file => !file.type.startsWith('image/'))) throw new Error('Only image files can be added.');
+    files.forEach(file => editPhotos.push({ file, preview: URL.createObjectURL(file) }));
+    element('edit-error').textContent = '';
+    renderEditPhotos();
+  } catch (error) { element('edit-error').textContent = error.message; }
+  event.target.value = '';
+});
+element('editor').addEventListener('cancel', event => { if (saving) event.preventDefault(); });
+element('editor').addEventListener('close', clearPhotoPreviews);
 
 function notice(message, error = false) {
   element('notice').textContent = message;
@@ -179,12 +283,7 @@ function render() {
     } else if (tab === 'content') {
       card.append(text('p', `${data.location || ''}\n${data.description || ''}\n${data.isArchived ? 'Archived' : 'Active'}`));
       action(actions, 'Edit', () => {
-        editing = doc.ref;
-        element('edit-title').value = data.title || '';
-        element('edit-location').value = data.location || '';
-        element('edit-description').value = data.description || '';
-        element('edit-error').textContent = '';
-        element('editor').showModal();
+        openEditor(doc);
         return false;
       });
       action(actions, data.isArchived ? 'Restore' : 'Archive', async () => {
@@ -263,7 +362,8 @@ async function reviewSuggestion(reference, approve) {
       const updates = {};
       const photos = Array.isArray(data.photoUrls) ? data.photoUrls.filter(url => typeof url === 'string' && url) : [];
       if (photos.length) {
-        updates.imageUrls = firebase.firestore.FieldValue.arrayUnion(...photos);
+        updates.imageUrls = VarablyContentEditor.mergePhotos(
+          VarablyContentEditor.photoList(spot.data()), photos);
         if (!spot.data().coverImage) updates.coverImage = photos[0];
       }
       if (typeof data.description === 'string' && data.description) updates.description = data.description;
@@ -279,17 +379,61 @@ async function reviewSuggestion(reference, approve) {
   });
 }
 
-element('cancel-edit').addEventListener('click', () => element('editor').close());
+element('cancel-edit').addEventListener('click', () => { if (!saving) element('editor').close(); });
 element('edit-form').addEventListener('submit', async event => {
   event.preventDefault();
-  if (!authorized || !editing) return;
+  if (!authorized || !editing) {
+    element('edit-error').textContent = 'Admin access is required.';
+    return;
+  }
+  if (saving) return;
+  saving = true;
   element('save').disabled = true;
+  element('cancel-edit').disabled = true;
+  editFields.concat(editChecks).forEach(field => { element(`edit-${field}`).disabled = true; });
+  renderEditPhotos();
+  const reference = editing;
+  const request = generation;
   try {
-    const title = element('edit-title').value.trim();
-    if (!title) throw new Error('Title is required.');
-    await editing.update({
-      title, location: element('edit-location').value.trim(),
-      description: element('edit-description').value.trim(), updatedAt: timestamp()
+    const values = {};
+    editFields.forEach(field => { values[field] = element(`edit-${field}`).value; });
+    const updates = VarablyContentEditor.buildUpdates({
+      ...values, parking: values.parking, costTier: values['cost-tier'], costNotes: values['cost-notes'],
+      customRepeat: values['custom-repeat'], locationSpot: values['location-spot'],
+      free: element('edit-free').checked, hasHours: element('edit-has-hours').checked,
+      allDay: element('edit-24-seven').checked, liveFeed: element('edit-live-feed').checked,
+      archived: element('edit-archived').checked,
+    }, reference.parent.id);
+    if (editPhotos.length > VarablyContentEditor.maxPhotos) throw new Error('Remove extra photos. The total limit is 10.');
+    if (updates.date) updates.date = firebase.firestore.Timestamp.fromDate(updates.date);
+    if (updates.locationSpotId) {
+      const linkedSpot = await db.collection('spots').doc(updates.locationSpotId).get();
+      if (!linkedSpot.exists) throw new Error('The linked spot does not exist.');
+    }
+    for (const photo of editPhotos) {
+      if (!authorized || request !== generation) throw new Error('Admin access or section changed. Reopen the editor.');
+      if (!photo.url) {
+        const upload = await firebase.storage().ref()
+          .child(`${reference.path}/${currentUser.uid}/${crypto.randomUUID()}`)
+          .put(photo.file, { contentType: photo.file.type });
+        photo.url = await upload.ref.getDownloadURL();
+      }
+    }
+    const cover = editPhotos[editCover];
+    updates.imageUrls = cover ? [cover.url, ...editPhotos.filter(photo => photo !== cover).map(photo => photo.url)] : [];
+    updates.coverImage = cover ? cover.url : '';
+    updates.updatedAt = timestamp();
+    for (const key of ['website', 'spotHours', 'hasHours', 'is24Seven']) {
+      if (Object.hasOwn(editingData, key)) updates[key] = firebase.firestore.FieldValue.delete();
+    }
+    if (!authorized || request !== generation) throw new Error('Admin access or section changed. Reopen the editor.');
+    await db.runTransaction(async transaction => {
+      const snapshot = await transaction.get(reference);
+      if (!snapshot.exists) throw new Error('This content no longer exists.');
+      if (JSON.stringify(snapshot.data().imageUrls || []) !== JSON.stringify(editingData.imageUrls || [])) {
+        throw new Error('Photos changed while editing. Close and reopen this editor before saving.');
+      }
+      transaction.update(reference, updates);
     });
     element('editor').close();
     await loadRecords(true);
@@ -298,5 +442,9 @@ element('edit-form').addEventListener('submit', async event => {
     console.error('[Admin Dashboard] Edit failed', error);
   } finally {
     element('save').disabled = false;
+    element('cancel-edit').disabled = false;
+    saving = false;
+    editFields.concat(editChecks).forEach(field => { element(`edit-${field}`).disabled = false; });
+    renderEditPhotos();
   }
 });

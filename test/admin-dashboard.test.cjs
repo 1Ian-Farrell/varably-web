@@ -60,18 +60,26 @@ function harness() {
         signOut: async () => {} }),
       firestore: Object.assign(() => ({
         collection: query, collectionGroup: query,
-      }), { FieldValue: { serverTimestamp: () => 'timestamp' } }),
+        runTransaction: async operation => operation({
+          get: async reference => ({ exists: true, data: () => reference._data }),
+          update: (reference, data) => writes.push({ path: reference.path, data }),
+        }),
+      }), { FieldValue: { serverTimestamp: () => 'timestamp', delete: () => 'deleted' },
+        Timestamp: { fromDate: date => date } }),
       functions: () => ({ httpsCallable: name => async parameters =>
         writes.push({ name, parameters }) }),
     },
     document: { getElementById: get, createElement: node, querySelectorAll: () => [] },
     window: { location: { replace(url) { redirected = url; } }, confirm: () => true },
     console: { error() {} },
+    VarablyContentEditor: require('../admin-content-editor.js'),
+    URL: { createObjectURL: () => 'blob:preview', revokeObjectURL() {} },
   });
   vm.runInContext(source, context);
   const settle = () => new Promise(resolve => setImmediate(resolve));
-  function record(id, data) {
-    return { id, ref: { path: `spot_claims/${id}` }, data: () => data };
+  function record(id, data, collection = 'spot_claims') {
+    const ref = { path: `${collection}/${id}`, parent: { id: collection }, _data: data };
+    return { id, ref, data: () => data };
   }
   return {
     get, queries, writes, context, record, settle,
@@ -169,4 +177,57 @@ test('website labels use Suggested Spot Edits', () => {
   assert.match(html, />Suggested Spot Edits<\/button>/);
   assert.doesNotMatch(html, /Spot Suggestions/);
   assert.doesNotMatch(source, /spot suggestion/i);
+});
+
+test('admin editor opens full spot fields and saves selected cover without changing ownership', async () => {
+  const app = harness();
+  const doc = app.record('spot', {
+    title: 'Original', creator: 'owner', imageUrls: ['first', 'cover'], coverImage: 'cover',
+    activities: [{ activityName: 'hiking', gear: ['boots'] }],
+    cost: { isFree: false, tier: '$$', notes: 'Admission' },
+    hoursOfOperation: { hasHours: true, is24Seven: true, schedule: null },
+  }, 'spots');
+  vm.runInContext("tab = 'content'", app.context);
+  app.setResult([doc]);
+  app.signIn({ uid: 'admin' });
+  app.role(true);
+  await app.settle();
+  const actions = app.get('records').children[0].children.at(-1);
+  await actions.children.find(button => button.textContent === 'Edit').handlers.click();
+  assert.equal(app.get('edit-spot-fields').hidden, false);
+  assert.equal(app.get('edit-event-fields').hidden, true);
+  assert.equal(app.get('edit-cost-tier').value, '$$');
+  app.get('edit-title').value = 'Updated';
+  await app.get('edit-form').handlers.submit({ preventDefault() {} });
+  assert.equal(app.writes.length, 1);
+  const saved = app.writes[0].data;
+  assert.equal(saved.title, 'Updated');
+  assert.deepEqual(Array.from(saved.imageUrls), ['cover', 'first']);
+  assert.equal(saved.coverImage, 'cover');
+  assert.equal(saved.creator, undefined);
+  assert.equal(saved.businessTier, undefined);
+  assert.equal(app.get('save').disabled, false);
+  assert.equal(app.get('edit-error').textContent, '');
+});
+
+test('editor rejects overflow and conflicting gallery edits explicitly', async () => {
+  const app = harness();
+  const doc = app.record('full', {
+    title: 'Full', imageUrls: Array.from({ length: 10 }, (_, i) => `photo-${i}`),
+  }, 'spots');
+  vm.runInContext("tab = 'content'", app.context);
+  app.setResult([doc]);
+  app.signIn({ uid: 'admin' });
+  app.role(true);
+  await app.settle();
+  const actions = app.get('records').children[0].children.at(-1);
+  await actions.children.find(button => button.textContent === 'Edit').handlers.click();
+  assert.equal(app.get('edit-photo-files').disabled, true);
+  const target = { files: [{ type: 'image/jpeg' }], value: '' };
+  app.get('edit-photo-files').handlers.change({ target });
+  assert.match(app.get('edit-error').textContent, /limit is 10/);
+  doc.ref._data = { ...doc.ref._data, imageUrls: ['changed-remotely'] };
+  await app.get('edit-form').handlers.submit({ preventDefault() {} });
+  assert.equal(app.writes.length, 0);
+  assert.match(app.get('edit-error').textContent, /Photos changed/);
 });
