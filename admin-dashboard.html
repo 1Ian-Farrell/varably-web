@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Varably Admin Dashboard</title>
+  <link rel="icon" href="Varably_Icon_Web_smaller.png">
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #121c24; color: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { background: #263238; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+    h1 { font-size: 22px; margin: 0; flex: 1; }
+    a { color: #7dd3fc; }
+    button, input, select, textarea { font: inherit; padding: 12px; border: 1px solid #546e7a; border-radius: 8px; }
+    button { cursor: pointer; background: #0284c7; color: white; min-height: 48px; }
+    button:disabled { opacity: .5; cursor: wait; }
+    button.danger { background: #a52632; }
+    [hidden] { display: none !important; }
+    main { max-width: 1200px; padding: 24px; margin: auto; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    nav button { background: #263238; }
+    nav button[aria-pressed="true"] { background: #0284c7; }
+    .toolbar, .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .toolbar input { flex: 1; min-width: 160px; }
+    article { background: #263238; border: 1px solid #455a64; border-radius: 12px; padding: 20px; margin: 16px 0; }
+    article h3 { margin-top: 0; }
+    article p { white-space: pre-wrap; overflow-wrap: anywhere; color: #cfd8dc; }
+    #notice { padding: 12px 0; white-space: pre-wrap; }
+    #notice.error { color: #ffb4ab; }
+    #more { margin-top: 16px; }
+    dialog { background: #263238; color: white; border: 1px solid #546e7a; border-radius: 12px; width: min(560px, 95vw); }
+    dialog::backdrop { background: #0009; }
+    dialog label { display: block; margin: 12px 0; }
+    dialog input, dialog textarea { width: 100%; margin-top: 6px; }
+    @media (max-width: 480px) { main { padding: 16px; } header { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <a href="index.html">Home</a>
+    <a href="pro-dashboard.html">Pro Dashboard</a>
+    <span id="account"></span>
+    <button id="signout" type="button">Sign out</button>
+  </header>
+  <main>
+    <p id="notice" role="status">Checking admin access...</p>
+    <section id="dashboard" hidden>
+      <nav aria-label="Admin sections">
+        <button type="button" data-tab="claims" aria-pressed="true">Spot Claims</button>
+        <button type="button" data-tab="content" aria-pressed="false">Content</button>
+        <button type="button" data-tab="users" aria-pressed="false">Users &amp; Roles</button>
+        <button type="button" data-tab="reports" aria-pressed="false">Content Reports</button>
+        <button type="button" data-tab="suggestions" aria-pressed="false">Spot Suggestions</button>
+      </nav>
+      <div class="toolbar">
+        <select id="collection" aria-label="Content type" hidden>
+          <option value="spots">Spots</option>
+          <option value="events">Events</option>
+        </select>
+        <input id="search" type="search" placeholder="Search loaded records" aria-label="Search loaded records">
+        <button id="refresh" type="button">Refresh</button>
+      </div>
+      <p>Records load 25 at a time. Search applies to records loaded in this section.</p>
+      <div id="records"></div>
+      <button id="more" type="button" hidden>Load more</button>
+    </section>
+  </main>
+  <dialog id="editor">
+    <form id="edit-form">
+      <h2>Edit content</h2>
+      <label>Title<input id="edit-title" required maxlength="500"></label>
+      <label>Location<input id="edit-location" maxlength="1000"></label>
+      <label>Description<textarea id="edit-description" rows="6" maxlength="20000"></textarea></label>
+      <p id="edit-error" role="alert"></p>
+      <div class="actions">
+        <button id="save" type="submit">Save</button>
+        <button id="cancel-edit" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6"
+    });
+  </script>
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>

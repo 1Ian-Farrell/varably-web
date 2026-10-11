@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="Varably_Icon_Blue_Orange.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
+    [hidden] { display: none !important; }
     :root {
       --bg-dark: #121c24;
       --card-bg: rgba(38, 50, 56, 0.85);
@@ -385,6 +386,7 @@
           <span class="material-icons" style="font-size: 18px;">account_circle</span>
           <span id="user-email"></span>
         </span>
+        <a id="admin-dashboard-link" href="admin-dashboard.html" class="btn-signout" hidden>Admin Dashboard</a>
         <button type="button" id="btn-signout" class="btn-signout">
           <span class="material-icons" style="font-size: 18px;">logout</span>
           Sign Out
@@ -590,6 +592,14 @@
       }
       currentUser = user;
       userEmailSpan.textContent = user.email || 'Pro user';
+      db.collection('users').doc(user.uid).get().then(function (snapshot) {
+        document.getElementById('admin-dashboard-link').hidden =
+          !snapshot.exists || snapshot.data().isAdmin !== true;
+      }).catch(function (error) {
+        console.error('Could not check admin access', error);
+        document.getElementById('admin-dashboard-link').hidden = true;
+        userEmailSpan.textContent = (user.email || 'Pro user') + ' (admin access check failed; reload to retry)';
+      });
       loadOwnedItems();
     });
 

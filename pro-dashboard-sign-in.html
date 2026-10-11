@@ -477,7 +477,7 @@
     // Only same-site pages on this list may be used as a post-sign-in target.
     function postSignInPage() {
       var next = new URLSearchParams(window.location.search).get('next');
-      return ['pro-dashboard.html', 'varably_payment.html'].indexOf(next) >= 0 ? next : 'pro-dashboard.html';
+      return ['pro-dashboard.html', 'admin-dashboard.html', 'varably_payment.html'].indexOf(next) >= 0 ? next : 'pro-dashboard.html';
     }
 
     // Password visibility toggle
