@@ -2,9 +2,12 @@
 
 ## Admin access
 
-Open `admin-dashboard.html`, or use **Admin Dashboard** from the home page.
-Signed-out visitors go through the existing sign-in page and return to the
-admin dashboard. Access requires `users/{uid}.isAdmin == true` in the same
+Open `admin-dashboard.html` directly if you are an administrator, or use the
+**Admin Dashboard** link on the signed-in Pro Dashboard. The link is hidden
+unless the current signed-in account has `users/{uid}.isAdmin == true`, and
+hides immediately if the role is revoked. Signed-out visitors go through the
+existing sign-in page and return to the admin dashboard. Dashboard access
+requires the same Firestore role in the same
 Firebase project as the mobile app. The dashboard watches this role and
 removes its content if admin access is revoked.
 

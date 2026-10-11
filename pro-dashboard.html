@@ -583,21 +583,27 @@
     var currentUser = null;
     var ownedItems = [];
     var slotsUnsubscribe = null;
+    var adminAccessUnsubscribe = null;
 
     // Auth guard: not signed in -> back to the sign-in page.
     auth.onAuthStateChanged(function (user) {
+      if (adminAccessUnsubscribe) {
+        adminAccessUnsubscribe();
+        adminAccessUnsubscribe = null;
+      }
+      var adminLink = document.getElementById('admin-dashboard-link');
+      adminLink.hidden = true;
       if (!user) {
         window.location.replace('pro-dashboard-sign-in.html');
         return;
       }
       currentUser = user;
       userEmailSpan.textContent = user.email || 'Pro user';
-      db.collection('users').doc(user.uid).get().then(function (snapshot) {
-        document.getElementById('admin-dashboard-link').hidden =
-          !snapshot.exists || snapshot.data().isAdmin !== true;
-      }).catch(function (error) {
+      adminAccessUnsubscribe = db.collection('users').doc(user.uid).onSnapshot(function (snapshot) {
+        adminLink.hidden = !snapshot.exists || snapshot.data().isAdmin !== true;
+      }, function (error) {
         console.error('Could not check admin access', error);
-        document.getElementById('admin-dashboard-link').hidden = true;
+        adminLink.hidden = true;
         userEmailSpan.textContent = (user.email || 'Pro user') + ' (admin access check failed; reload to retry)';
       });
       loadOwnedItems();

@@ -163,14 +163,19 @@ test('untrusted record strings are rendered as text, not HTML', async () => {
   assert.equal(title.children.length, 0);
 });
 
-test('existing sign-in flow permits the admin target and site links reach it', () => {
+test('the landing page omits the admin link and only the signed-in Pro page can show it', () => {
   const signin = fs.readFileSync(path.join(root, 'pro-dashboard-sign-in.html'), 'utf8');
   const fragment = signin.slice(signin.indexOf('function postSignInPage()'),
     signin.indexOf('function postSignInPage()') + 400);
   assert.match(fragment, /'admin-dashboard\.html'/);
-  for (const file of ['index.html', 'pro-dashboard.html']) {
-    assert.match(fs.readFileSync(path.join(root, file), 'utf8'), /href="admin-dashboard\.html"/);
-  }
+  const landing = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.doesNotMatch(landing, /href=["']admin-dashboard\.html["']/i);
+  const proPage = fs.readFileSync(path.join(root, 'pro-dashboard.html'), 'utf8');
+  assert.match(proPage, /id="admin-dashboard-link"[^>]*hidden/);
+  assert.match(proPage, /auth\.onAuthStateChanged/);
+  assert.match(proPage, /snapshot\.data\(\)\.isAdmin !== true/);
+  assert.match(proPage, /adminLink\.hidden = true/);
+  assert.match(proPage, /adminAccessUnsubscribe\(\)/);
 });
 
 test('website labels use Suggested Spot Edits', () => {
