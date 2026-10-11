@@ -10,7 +10,7 @@ removes its content if admin access is revoked.
 
 The dashboard supports pending claim approval/rejection, basic content editing
 (title, location, description) and archiving/restoring, account suspension,
-restoration/deletion, report resolution, and spot suggestion approval/rejection.
+restoration/deletion, report resolution, and suggested spot edit approval/rejection.
 Account actions use the existing admin-only Firebase callable functions.
 Firestore rules enforce database access; client-side role checks do not
 replace those rules. Granting admin roles is not exposed in this dashboard.

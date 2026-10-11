@@ -253,8 +253,8 @@ async function reviewClaim(reference, approve) {
 async function reviewSuggestion(reference, approve) {
   await db.runTransaction(async transaction => {
     const snapshot = await transaction.get(reference);
-    if (!snapshot.exists || snapshot.data().status !== 'pending') throw new Error('This suggestion is no longer pending.');
-    if (reference.parent.parent.parent.id !== 'spots') throw new Error('This is not a spot suggestion.');
+    if (!snapshot.exists || snapshot.data().status !== 'pending') throw new Error('This suggested spot edit is no longer pending.');
+    if (reference.parent.parent.parent.id !== 'spots') throw new Error('This is not a suggested spot edit.');
     if (approve) {
       const data = snapshot.data();
       const spotRef = reference.parent.parent;

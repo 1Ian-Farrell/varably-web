@@ -163,3 +163,10 @@ test('existing sign-in flow permits the admin target and site links reach it', (
     assert.match(fs.readFileSync(path.join(root, file), 'utf8'), /href="admin-dashboard\.html"/);
   }
 });
+
+test('website labels use Suggested Spot Edits', () => {
+  const html = fs.readFileSync(path.join(root, 'admin-dashboard.html'), 'utf8');
+  assert.match(html, />Suggested Spot Edits<\/button>/);
+  assert.doesNotMatch(html, /Spot Suggestions/);
+  assert.doesNotMatch(source, /spot suggestion/i);
+});
