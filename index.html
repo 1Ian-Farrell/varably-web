@@ -430,6 +430,22 @@
       z-index: 2;
     }
 
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .footer-links a {
+      color: var(--bluegrey-light);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
     @media (max-width: 900px) {
       .features-grid {
         grid-template-columns: 1fr;
@@ -530,8 +546,8 @@
           <div class="feature-icon">
             <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
           </div>
-          <h3>Proximity Alerts</h3>
-          <p>Get notified when you are near venues offering exclusive deals and live updates.</p>
+          <h3>Daily Event Digest</h3>
+          <p>Get one daily digest of geofenced events you visited, and browse it anytime in the app.</p>
         </div>
 
         <div class="feature-card">
@@ -583,6 +599,9 @@
   <footer class="footer">
     <div class="container">
       <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+      <nav class="footer-links" aria-label="Legal">
+        <a href="terms.html">Terms and Conditions</a>
+      </nav>
     </div>
   </footer>
 

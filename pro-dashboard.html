@@ -284,6 +284,17 @@
       background: rgba(255,255,255,0.08); padding: 0.1rem 0.4rem; border-radius: 6px; margin-top: 0.2rem;
     }
 
+    .tier-badge {
+      display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem;
+      border-radius: 6px; margin-top: 0.2rem; margin-left: 0.25rem;
+    }
+    .tier-badge.free { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+    .tier-badge.starter { background: rgba(56,189,248,0.18); color: #38bdf8; }
+    .tier-badge.pro { background: rgba(255,167,38,0.18); color: #ffa726; }
+    .btn-plan {
+      background: var(--accent-blue); color: #fff; border-radius: 8px; padding: 0.45rem 0.85rem;
+      font-size: 0.8rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+    }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .switch-slider {
@@ -400,20 +411,26 @@
     <div class="container">
       <div class="dash-header">
         <h1>Pro Dashboard</h1>
-        <p>Manage your business spots, events, and proximity alerts. <a href="varably_payment.html" style="color:#38bdf8;">Boost a spot or event &rarr;</a></p>
+        <p>Manage your business spots, events, and plans.
+          <a href="create.html" style="color:#38bdf8;">Create an event or claim a spot &rarr;</a>
+          &nbsp;&middot;&nbsp; <a href="varably_payment.html" style="color:#38bdf8;">View plans &rarr;</a></p>
       </div>
 
       <div id="empty-state" class="empty-state" style="display:none;">
         <span class="material-icons">storefront</span>
         <h3>No claimed spots or events yet</h3>
-        <p>Claim a spot or create an event in the Varably app to unlock the Pro Dashboard.</p>
+        <p>Claim a spot or create an event to unlock the Pro Dashboard.</p>
+        <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; margin-top:1.25rem;">
+          <a class="btn-signout" href="create.html" style="text-decoration:none;"><span class="material-icons" style="font-size:18px;">event</span> Create an Event</a>
+          <a class="btn-signout" href="create.html#claim" style="text-decoration:none;"><span class="material-icons" style="font-size:18px;">storefront</span> Claim a Spot</a>
+        </div>
       </div>
 
       <div id="dashboard-body" style="display:none;">
         <div class="tab-bar">
           <button class="tab-btn active" data-tab="overview"><span class="material-icons" style="font-size:18px;">storefront</span> My Spots &amp; Events</button>
           <button class="tab-btn" data-tab="calendar"><span class="material-icons" style="font-size:18px;">calendar_month</span> Notification Calendar</button>
-          <button class="tab-btn" data-tab="geofencing"><span class="material-icons" style="font-size:18px;">location_on</span> Geofencing</button>
+          <button class="tab-btn" data-tab="plans"><span class="material-icons" style="font-size:18px;">workspace_premium</span> Plans</button>
           <button class="tab-btn" data-tab="analytics"><span class="material-icons" style="font-size:18px;">analytics</span> Analytics</button>
         </div>
 
@@ -434,13 +451,14 @@
           <div class="calendar-grid" id="calendar-grid"></div>
         </section>
 
-        <!-- Geofencing -->
-        <section class="tab-panel" id="tab-geofencing">
+        <!-- Plans -->
+        <section class="tab-panel" id="tab-plans">
           <div class="calendar-notice">
-            Automatically notify Varably users who come within half a mile of a spot or event. $30/month per listing,
-            cancel anytime.
+            Each claimed spot has its own plan: <strong>Free</strong>, <strong>Starter</strong> ($39/mo: daily specials,
+            analytics, official event tags) or <strong>Pro</strong> ($129/mo: proximity alerts, boost rewards, scheduling
+            and templates). <a href="varably_payment.html" style="color:#38bdf8;">Compare plans &rarr;</a>
           </div>
-          <div id="geofence-list"></div>
+          <div id="plans-list"></div>
         </section>
 
         <!-- Analytics -->
@@ -454,10 +472,10 @@
           <h3 style="margin-bottom:0.25rem;">Pro Analytics</h3>
           <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Click-through rate, peak engagement hours, and notification performance.</p>
           <div id="pro-analytics-locked" class="upsell-card">
-            <h3>Unlock Pro Analytics</h3>
-            <p>Enable proximity alerts on any spot or event ($30/mo) to unlock click-through rates, peak
+            <h3>Unlock Analytics</h3>
+            <p>Upgrade a claimed spot to Starter ($39/mo) or Pro ($129/mo) to unlock click-through rates, peak
               engagement times, and notification performance.</p>
-            <button id="btn-goto-geofencing">Go to Geofencing</button>
+            <button id="btn-goto-plans">See Plans</button>
           </div>
           <div id="pro-analytics-unlocked" style="display:none;">
             <div class="ctr-card">
@@ -475,7 +493,7 @@
               <h3>Notification Performance</h3>
               <div class="stat-row">
                 <div class="stat-chip"><span class="material-icons">campaign</span><div class="stat-value" id="stat-blasts">0</div><div class="stat-label">Blasts Booked</div></div>
-                <div class="stat-chip"><span class="material-icons">location_on</span><div class="stat-value" id="stat-geofences">0</div><div class="stat-label">Geofenced Spots</div></div>
+                <div class="stat-chip"><span class="material-icons">workspace_premium</span><div class="stat-value" id="stat-geofences">0</div><div class="stat-label">Pro Spots</div></div>
               </div>
               <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.75rem; line-height:1.5;">
                 <span id="stat-alerts-sent">0</span> proximity alerts delivered across your listings.
@@ -621,8 +639,8 @@
     document.querySelectorAll('.tab-btn').forEach(function (btn) {
       btn.addEventListener('click', function () { activateTab(btn.dataset.tab); });
     });
-    document.getElementById('btn-goto-geofencing').addEventListener('click', function () {
-      activateTab('geofencing');
+    document.getElementById('btn-goto-plans').addEventListener('click', function () {
+      activateTab('plans');
     });
 
     function activateTab(tab) {
@@ -667,8 +685,15 @@
         sharesCount: d.sharesCount || 0,
         viewsCount: d.viewsCount || 0,
         linkClicksCount: d.linkClicksCount || 0,
-        geofenceEnabled: d.geofenceEnabled === true
+        businessTier: collectionPath === 'spots' && (d.businessTier === 'starter' || d.businessTier === 'pro')
+          ? d.businessTier : (collectionPath === 'spots' ? 'free' : null)
       };
+    }
+
+    var TIER_LABELS = { free: 'FREE', starter: 'STARTER', pro: 'PRO' };
+    function hasProSpot() { return ownedItems.some(function (i) { return i.businessTier === 'pro'; }); }
+    function hasPaidSpot() {
+      return ownedItems.some(function (i) { return i.businessTier === 'starter' || i.businessTier === 'pro'; });
     }
 
     function engagementCount(item) { return item.isEvent ? item.interestedCount : item.likesCount; }
@@ -684,7 +709,7 @@
       dashboardBody.style.display = 'block';
       renderOverview();
       renderCalendar();
-      renderGeofencing();
+      renderPlans();
       renderAnalytics();
     }
 
@@ -718,7 +743,7 @@
           '<div class="item-card-top">' + thumb +
           '<div><div class="item-title">' + escapeHtml(item.title) + '</div>' +
           '<span class="item-badge ' + badgeClass + '">' + badgeText + '</span>' +
-          (item.geofenceEnabled ? ' <span class="material-icons" style="font-size:14px;color:#4ade80;vertical-align:middle;">location_on</span>' : '') +
+          (item.businessTier ? '<span class="tier-badge ' + item.businessTier + '">' + TIER_LABELS[item.businessTier] + '</span>' : '') +
           '</div></div>' +
           '<div class="item-stats">' +
           '<div class="item-stat"><span class="material-icons">visibility</span>' + item.viewsCount + '</div>' +
@@ -749,7 +774,8 @@
     function calendarDates() {
       var today = new Date(); today.setHours(0, 0, 0, 0);
       var arr = [];
-      for (var i = 0; i < 14; i++) { var d = new Date(today); d.setDate(today.getDate() + i); arr.push(d); }
+      var days = hasProSpot() ? 56 : 14;
+      for (var i = 0; i < days; i++) { var d = new Date(today); d.setDate(today.getDate() + i); arr.push(d); }
       return arr;
     }
 
@@ -759,7 +785,8 @@
       var slotIds = ids.map(function (id) { return market.id + '_' + id; });
       if (slotsUnsubscribe) slotsUnsubscribe();
       slotsUnsubscribe = db.collection('notification_slots')
-        .where(firebase.firestore.FieldPath.documentId(), 'in', slotIds)
+        .where(firebase.firestore.FieldPath.documentId(), '>=', slotIds[0])
+        .where(firebase.firestore.FieldPath.documentId(), '<=', slotIds[slotIds.length - 1])
         .onSnapshot(function (snapshot) {
           var byDate = {};
           snapshot.forEach(function (doc) { byDate[doc.data().date || doc.id] = doc.data(); });
@@ -847,43 +874,24 @@
     }
 
     // ---------------------------------------------------------------
-    // Geofencing tab
+    // Plans tab (plan changes happen on the plans page)
     // ---------------------------------------------------------------
-    function renderGeofencing() {
-      var list = document.getElementById('geofence-list');
-      list.innerHTML = ownedItems.map(function (item, i) {
-        return '<div class="geo-row' + (item.geofenceEnabled ? ' enabled' : '') + '">' +
+    function renderPlans() {
+      var list = document.getElementById('plans-list');
+      var spots = ownedItems.filter(function (i) { return !i.isEvent; });
+      if (spots.length === 0) {
+        list.innerHTML = '<div class="geo-row"><div style="font-size:0.85rem;">No claimed spots yet. ' +
+          '<a href="create.html#claim" style="color:#38bdf8;">Claim your spot</a> to choose a plan.</div></div>';
+        return;
+      }
+      list.innerHTML = spots.map(function (item) {
+        var tier = item.businessTier || 'free';
+        return '<div class="geo-row' + (tier !== 'free' ? ' enabled' : '') + '">' +
           '<div><div class="item-title">' + escapeHtml(item.title) + '</div>' +
-          '<span style="font-size:0.75rem;color:var(--bluegrey-light);">' + (item.isEvent ? 'Event' : 'Spot') + '</span> ' +
-          '<span class="geo-price-tag">$30/mo</span></div>' +
-          '<label class="switch"><input type="checkbox" data-geo-index="' + i + '" ' + (item.geofenceEnabled ? 'checked' : '') + '><span class="switch-slider"></span></label>' +
-          '</div>';
+          '<span class="tier-badge ' + tier + '" style="margin-left:0;">' + TIER_LABELS[tier] + '</span></div>' +
+          '<a class="btn-plan" href="varably_payment.html?spot=' + encodeURIComponent(item.id) + '">' +
+          (tier === 'free' ? 'Upgrade' : 'Manage plan') + '</a></div>';
       }).join('');
-
-      list.querySelectorAll('[data-geo-index]').forEach(function (input) {
-        input.addEventListener('change', function () {
-          var item = ownedItems[Number(input.dataset.geoIndex)];
-          input.disabled = true;
-          setGeofence(item, input.checked).finally(function () { input.disabled = false; });
-        });
-      });
-    }
-
-    function setGeofence(item, enabled) {
-      var request = enabled
-        ? runCheckout({ product: 'geofence', targetType: item.collectionPath, targetId: item.id })
-        : functions.httpsCallable('cancelFeature')({ product: 'geofence', targetType: item.collectionPath, targetId: item.id })
-            .then(function (result) {
-              if (result.data && result.data.status === 'canceling') {
-                alert('Proximity alerts will stop at the end of this billing period.');
-              }
-            });
-      return request.then(function () {
-        refreshOwnedItems();
-      }).catch(function (err) {
-        alert('Could not update proximity alerts: ' + err.message);
-        refreshOwnedItems();
-      });
     }
 
     // ---------------------------------------------------------------
@@ -895,12 +903,12 @@
     function renderAnalytics() {
       renderTotalsChart();
 
-      db.collection('geofence_subscriptions')
+      db.collection('business_subscriptions')
         .where('ownerUid', '==', currentUser.uid)
         .where('status', 'in', ['active', 'active_beta', 'canceling'])
         .get()
         .then(function (subsSnap) {
-          var isSubscribed = subsSnap.size > 0;
+          var isSubscribed = subsSnap.size > 0 || hasPaidSpot();
           var alertsSent = 0;
           subsSnap.forEach(function (doc) { alertsSent += doc.data().deliveredCount || 0; });
           document.getElementById('stat-alerts-sent').textContent = alertsSent;
@@ -947,7 +955,7 @@
       db.collection('notification_slots').where('ownerUid', '==', currentUser.uid).get().then(function (snap) {
         document.getElementById('stat-blasts').textContent = snap.size;
       });
-      document.getElementById('stat-geofences').textContent = ownedItems.filter(function (i) { return i.geofenceEnabled; }).length;
+      document.getElementById('stat-geofences').textContent = ownedItems.filter(function (i) { return i.businessTier === 'pro'; }).length;
 
       var ids = ownedItems.map(function (i) { return i.id; }).slice(0, 30);
       if (ids.length === 0) { renderPeakTimesChart(new Array(24).fill(0)); return; }

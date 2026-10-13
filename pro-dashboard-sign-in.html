@@ -477,7 +477,7 @@
     // Only same-site pages on this list may be used as a post-sign-in target.
     function postSignInPage() {
       var next = new URLSearchParams(window.location.search).get('next');
-      return ['pro-dashboard.html', 'admin-dashboard.html', 'varably_payment.html'].indexOf(next) >= 0 ? next : 'pro-dashboard.html';
+      return ['pro-dashboard.html', 'admin-dashboard.html', 'varably_payment.html', 'create.html'].indexOf(next) >= 0 ? next : 'pro-dashboard.html';
     }
 
     // Password visibility toggle
@@ -524,7 +524,7 @@
       switch (code) {
         case 'auth/invalid-email': return 'Please enter a valid email address.';
         case 'auth/missing-password': return 'Please enter your password.';
-        case 'auth/user-disabled': return 'This account has been disabled. Contact support.';
+        case 'auth/user-disabled': return 'This account has been disabled. Contact support@varably.com.';
         case 'auth/user-not-found':
         case 'auth/wrong-password':
         case 'auth/invalid-credential': return 'Incorrect email or password.';

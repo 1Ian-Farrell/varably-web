@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varably | Create an Event or Claim a Spot</title>
+  <link rel="icon" type="image/png" href="Varably_Icon_Blue_Orange.png">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121c24;
+      --card-bg: rgba(38, 50, 56, 0.85);
+      --card-bg-solid: #263238;
+      --border-color: rgba(120, 144, 156, 0.35);
+      --primary: #f06836;
+      --event-orange: #ff9800;
+      --accent-blue: #0284c7;
+      --accent-blue-hover: #0369a1;
+      --bluegrey-light: #b0bec5;
+      --text-main: #ffffff;
+      --text-muted: #cfd8dc;
+      --success: #22c55e;
+      --danger: #ef5350;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(circle at 50% 20%, rgba(240, 104, 54, 0.08) 0%, transparent 60%);
+    }
+
+    a { color: #38bdf8; }
+
+    .header-nav {
+      width: 100%;
+      background: rgba(120, 144, 156, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-img { height: 40px; width: auto; }
+
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .btn-signout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-signout:hover { background: var(--accent-blue-hover); }
+
+    main { flex: 1; padding: 2rem 0 4rem; }
+
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; }
+    .lead { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      margin-bottom: 1.25rem;
+    }
+
+    .card h2 { font-size: 1.05rem; margin-bottom: 1rem; }
+
+    .field { margin-bottom: 1rem; position: relative; }
+
+    .field label, .label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .req { color: var(--event-orange); }
+    .optional { font-weight: 400; color: var(--bluegrey-light); }
+
+    input[type="text"], input[type="tel"], input[type="url"], input[type="date"], input[type="time"], textarea, select {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(18, 28, 36, 0.7);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-blue); }
+    textarea { resize: vertical; min-height: 90px; }
+    input[type="date"], input[type="time"] { color-scheme: dark; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .chip {
+      border: 1px solid var(--border-color);
+      background: rgba(18, 28, 36, 0.6);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip.selected { border-color: var(--accent-blue); background: rgba(2, 132, 199, 0.18); color: #fff; }
+
+    /* Location search */
+    .suggestions {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 20;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .suggestions.open { display: block; }
+
+    .suggestion {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      cursor: pointer;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .suggestion:hover, .suggestion.active { background: rgba(2, 132, 199, 0.2); }
+    .suggestion .addr { color: var(--bluegrey-light); font-size: 0.78rem; }
+    .suggestion .dist { color: var(--bluegrey-light); font-size: 0.75rem; white-space: nowrap; }
+    .location-picked { color: var(--success); font-size: 0.78rem; margin-top: 0.35rem; display: none; }
+
+    /* Photos */
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.6rem; }
+
+    .photo {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .photo.cover { border-color: var(--event-orange); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .photo .cover-tag {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      background: var(--event-orange);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    .photo .remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .photo-add {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      border: 2px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--bluegrey-light);
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .hint { color: var(--bluegrey-light); font-size: 0.75rem; margin-top: 0.35rem; }
+
+    .list-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .list-row input { flex: 1; }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 0 0.6rem;
+      cursor: pointer;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 0.25rem 0;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      background: var(--event-orange);
+      color: #111;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary.blue { background: var(--accent-blue); color: #fff; }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .banner {
+      display: none;
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.92rem;
+    }
+
+    .banner.show { display: block; }
+    .banner.success { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.4); }
+    .banner.error { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .banner.warning { background: rgba(255, 152, 0, 0.12); border: 1px solid rgba(255, 152, 0, 0.5); }
+
+    /* Claim tab */
+    .spot-result {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: rgba(18, 28, 36, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .spot-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .spot-info { flex: 1; min-width: 0; }
+    .spot-title { font-weight: 700; font-size: 0.95rem; }
+
+    .spot-loc {
+      color: var(--bluegrey-light);
+      font-size: 0.78rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-claim {
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      background: var(--accent-blue);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .btn-claim:disabled { background: #37474f; color: #90a4ae; cursor: not-allowed; }
+
+    .status-tag { font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
+    .status-tag.pending { background: rgba(255, 152, 0, 0.18); color: #ffb74d; }
+    .status-tag.approved { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+    .status-tag.rejected { background: rgba(239, 83, 80, 0.18); color: #ef9a9a; }
+
+    .empty { color: var(--bluegrey-light); font-size: 0.88rem; text-align: center; padding: 1.25rem 0; }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      max-width: 440px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-box h3 { margin-bottom: 0.35rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.25rem; }
+
+    .modal-actions button {
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+    }
+
+    .modal-actions .btn-cancel { background: transparent; color: var(--text-muted); }
+    .modal-actions .btn-confirm { background: var(--accent-blue); color: #fff; }
+
+    .overlay-loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 28, 36, 0.85);
+      z-index: 60;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      font-weight: 700;
+    }
+
+    .overlay-loading.open { display: flex; }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255, 255, 255, 0.15);
+      border-top-color: var(--event-orange);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .container { padding: 0 1rem; }
+      .row { grid-template-columns: 1fr; }
+      .row-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 1.4rem; }
+      .logo-img { height: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-nav">
+    <div class="container navbar">
+      <a href="index.html"><img src="varably_logo_new.png" alt="Varably" class="logo-img"></a>
+      <div class="nav-right">
+        <a class="nav-link" href="pro-dashboard.html">Pro Dashboard</a>
+        <a class="nav-link" href="varably_payment.html">Plans</a>
+        <button type="button" id="btn-signout" class="btn-signout">
+          <span class="material-icons" style="font-size: 18px;">logout</span>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1>Create &amp; Claim</h1>
+      <p class="lead">Post an event to the Varably feed or claim your business's spot, right from the web. <span id="user-email"></span></p>
+
+      <div id="banner" class="banner" role="status"></div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="event"><span class="material-icons" style="font-size:18px;">event</span> Create Event</button>
+        <button class="tab-btn" data-tab="claim"><span class="material-icons" style="font-size:18px;">storefront</span> Claim a Spot</button>
+      </div>
+
+      <!-- ============================ CREATE EVENT ============================ -->
+      <section class="tab-panel active" id="tab-event">
+        <form id="event-form" novalidate>
+          <div class="card">
+            <h2>Basics</h2>
+            <div class="field">
+              <label for="ev-title">Event Title <span class="req">*</span></label>
+              <input type="text" id="ev-title" maxlength="100" placeholder="e.g. Sunset Yoga on the Esplanade">
+            </div>
+            <div class="field">
+              <label for="ev-location">Location <span class="req">*</span></label>
+              <input type="text" id="ev-location" autocomplete="off" placeholder="Search for a place or address">
+              <div class="suggestions" id="ev-suggestions"></div>
+              <div class="location-picked" id="ev-location-picked">&#10003; Location selected</div>
+              <div class="hint">Pick a result from the list. Results near you are shown first.</div>
+            </div>
+            <div class="field">
+              <label for="ev-description">Event Description <span class="optional">(optional)</span></label>
+              <textarea id="ev-description" placeholder="What should people know?"></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Photos <span class="req">*</span></h2>
+            <div class="photo-grid" id="photo-grid"></div>
+            <input type="file" id="photo-input" accept="image/*" multiple style="display:none;">
+            <div class="hint">Add up to 10 photos. Click a photo to make it the cover.</div>
+          </div>
+
+          <div class="card">
+            <h2>When <span class="req">*</span></h2>
+            <div class="row">
+              <div class="field">
+                <label for="ev-date">Date</label>
+                <input type="date" id="ev-date">
+              </div>
+              <div class="field">
+                <label for="ev-start">Start time</label>
+                <input type="time" id="ev-start" value="18:00">
+              </div>
+              <div class="field">
+                <label for="ev-end">End time</label>
+                <input type="time" id="ev-end" value="20:00">
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="field">
+                <label for="ev-repeat">Repeats</label>
+                <select id="ev-repeat">
+                  <option>Does not repeat</option>
+                  <option>Every day</option>
+                  <option>Every week</option>
+                  <option>Every month</option>
+                  <option value="Custom...">Custom...</option>
+                </select>
+              </div>
+              <div class="field" id="ev-custom-repeat-wrap" style="display:none;">
+                <label for="ev-custom-repeat">Custom repeat</label>
+                <input type="text" id="ev-custom-repeat" placeholder="e.g. Every 2 weeks">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Details <span class="optional">(optional)</span></h2>
+            <div class="field">
+              <span class="label">Cost</span>
+              <div class="chips" id="cost-chips">
+                <button type="button" class="chip" data-cost="Free">Free</button>
+                <button type="button" class="chip" data-cost="$">$</button>
+                <button type="button" class="chip selected" data-cost="$$">$$</button>
+                <button type="button" class="chip" data-cost="$$$">$$$</button>
+                <button type="button" class="chip" data-cost="$$$$">$$$$</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ev-cost-notes">Cost notes</label>
+              <input type="text" id="ev-cost-notes" placeholder="e.g. $10 at the door, kids free">
+            </div>
+            <div class="field">
+              <span class="label">Environment</span>
+              <div class="chips" id="env-chips">
+                <button type="button" class="chip selected" data-env="outdoor">Outdoor</button>
+                <button type="button" class="chip" data-env="indoor">Indoor</button>
+                <button type="button" class="chip" data-env="both">Both</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="label">Parking Availability</span>
+              <div class="chips" id="parking-chips">
+                <button type="button" class="chip selected" data-parking="1">Free Lot</button>
+                <button type="button" class="chip" data-parking="2">Street Parking</button>
+                <button type="button" class="chip" data-parking="3">Paid Garage</button>
+                <button type="button" class="chip" data-parking="4">No Parking</button>
+                <button type="button" class="chip" data-parking="5">Unknown</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="label">Activities <span class="optional">(optional)</span></span>
+              <div id="activity-list"></div>
+              <button type="button" class="link-btn" id="add-activity">+ Add activity</button>
+            </div>
+            <div class="field">
+              <span class="label">Links <span class="optional">(optional)</span></span>
+              <div id="link-list"></div>
+              <button type="button" class="link-btn" id="add-link">+ Add link</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-create-event">Post Event</button>
+        </form>
+      </section>
+
+      <!-- ============================ CLAIM A SPOT ============================ -->
+      <section class="tab-panel" id="tab-claim">
+        <div class="card">
+          <h2>Find your business</h2>
+          <div class="field">
+            <input type="text" id="claim-search" autocomplete="off" placeholder="Search business spots by name or address">
+            <div class="hint">Only business spots can be claimed. Our team reviews every claim before you get access.</div>
+          </div>
+          <div id="claim-results"><div class="empty">Loading spots&hellip;</div></div>
+        </div>
+
+        <div class="card">
+          <h2>Your claim requests</h2>
+          <div id="my-claims"><div class="empty">No claim requests yet.</div></div>
+        </div>
+
+        <p class="hint" style="text-align:center;">Can't find your business? Email <a href="mailto:support@varably.com">support@varably.com</a> and we'll add it for you to claim.</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- Claim modal -->
+  <div class="modal-overlay" id="claim-modal">
+    <form class="modal-box" id="claim-form" novalidate>
+      <h3 id="claim-modal-title">Claim spot</h3>
+      <p class="hint" style="margin-bottom:1rem;">Provide your details to verify your official ownership or representation.</p>
+      <div class="field">
+        <label for="claim-name">Full Name <span class="req">*</span></label>
+        <input type="text" id="claim-name">
+      </div>
+      <div class="field">
+        <label for="claim-phone">Phone Number <span class="req">*</span></label>
+        <input type="tel" id="claim-phone">
+      </div>
+      <div class="field">
+        <label for="claim-role">Role <span class="req">*</span></label>
+        <input type="text" id="claim-role" placeholder="e.g. Owner, Manager">
+      </div>
+      <div class="field">
+        <label for="claim-notes">Verification Notes / Official Website <span class="optional">(optional)</span></label>
+        <textarea id="claim-notes"></textarea>
+      </div>
+      <p class="hint" id="claim-error" style="color:#ef9a9a;"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="claim-cancel">Cancel</button>
+        <button type="submit" class="btn-confirm" id="claim-submit">Submit Claim</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="overlay-loading" id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text">Posting your event&hellip;</div>
+  </div>
+
+  <footer style="text-align:center; padding:1.5rem; color:var(--bluegrey-light); font-size:0.85rem; border-top:1px solid var(--border-color);">
+    <p>&copy; 2026 Varably Technologies LLC. All rights reserved.</p>
+  </footer>
+
+  <!-- Firebase (vaycayauth project) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script>
+    // Matches lib/firebase_options.dart (web) in the vaycay_application Flutter app
+    firebase.initializeApp({
+      apiKey: "AIzaSyCuLOnJAgSZZDypegNseOeeIarAXHZzd0Q",
+      authDomain: "vaycayauth.firebaseapp.com",
+      projectId: "vaycayauth",
+      storageBucket: "vaycayauth.firebasestorage.app",
+      messagingSenderId: "894050703795",
+      appId: "1:894050703795:web:7606e2b23bfaea74bed3c6",
+      measurementId: "G-MNJRMQBK51"
+    });
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+    var storage = firebase.storage();
+    var FieldValue = firebase.firestore.FieldValue;
+
+    // Same public token the app's location search uses.
+    var MAPBOX_TOKEN = 'pk.eyJ1IjoiaWpmYXJyZWxsNDI1MCIsImEiOiJjbXNkeDF4dXAwNDU1Mnlvb2psYmpjZGI5In0.8sghHK-HGUU8TM-R0V9VAw';
+    var MAX_PHOTOS = 10;
+
+    var currentUser = null;
+
+    // ---------------------------------------------------------------
+    // Shared helpers
+    // ---------------------------------------------------------------
+    function escapeHtml(str) {
+      return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    var bannerEl = document.getElementById('banner');
+    function showBanner(kind, text) {
+      bannerEl.className = 'banner show ' + kind;
+      bannerEl.textContent = text;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function hideBanner() { bannerEl.className = 'banner'; }
+
+    function setLoading(on, text) {
+      document.getElementById('loading-text').textContent = text || 'Working\u2026';
+      document.getElementById('loading-overlay').classList.toggle('open', on);
+    }
+
+    function uuidv4() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Auth
+    // ---------------------------------------------------------------
+    auth.onAuthStateChanged(function (user) {
+      if (!user) {
+        window.location.replace('pro-dashboard-sign-in.html?next=create.html');
+        return;
+      }
+      currentUser = user;
+      document.getElementById('user-email').textContent = user.email ? 'Signed in as ' + user.email + '.' : '';
+      loadClaimableSpots();
+      watchMyClaims();
+    });
+
+    document.getElementById('btn-signout').addEventListener('click', function () {
+      auth.signOut().then(function () { window.location.replace('pro-dashboard-sign-in.html'); });
+    });
+
+    // ---------------------------------------------------------------
+    // Tabs (#claim deep-links to the claim tab)
+    // ---------------------------------------------------------------
+    function activateTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tab); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'tab-' + tab); });
+      hideBanner();
+    }
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activateTab(btn.dataset.tab);
+        history.replaceState(null, '', btn.dataset.tab === 'claim' ? '#claim' : window.location.pathname);
+      });
+    });
+    if (window.location.hash === '#claim') activateTab('claim');
+
+    // ---------------------------------------------------------------
+    // Location search (Mapbox Search Box, biased to the user's location)
+    // ---------------------------------------------------------------
+    var userPosition = null;
+    var positionRequested = false;
+    function requestUserPosition() {
+      if (positionRequested || !navigator.geolocation) return;
+      positionRequested = true;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      }, function () { /* Denied: search still works, just without proximity. */ },
+      { maximumAge: 10 * 60 * 1000, timeout: 8000 });
+    }
+
+    function distanceMeters(a, b) {
+      var R = 6371000, toRad = Math.PI / 180;
+      var dLat = (b.lat - a.lat) * toRad, dLng = (b.lng - a.lng) * toRad;
+      var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(a.lat * toRad) * Math.cos(b.lat * toRad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return 2 * R * Math.asin(Math.sqrt(h));
+    }
+
+    function formatDistance(m) {
+      if (m == null) return '';
+      var miles = m / 1609.344;
+      return miles < 0.1 ? Math.round(m * 3.28084) + ' ft' : miles.toFixed(miles < 10 ? 1 : 0) + ' mi';
+    }
+
+    var locationInput = document.getElementById('ev-location');
+    var suggestionsEl = document.getElementById('ev-suggestions');
+    var pickedEl = document.getElementById('ev-location-picked');
+    var selectedLocation = null;
+    var searchSession = uuidv4();
+    var searchTimer = null;
+    var searchSeq = 0;
+    var suggestions = [];
+    var activeSuggestion = -1;
+
+    locationInput.addEventListener('focus', requestUserPosition);
+    locationInput.addEventListener('input', function () {
+      selectedLocation = null;
+      pickedEl.style.display = 'none';
+      clearTimeout(searchTimer);
+      var q = locationInput.value.trim();
+      if (q.length < 2) { closeSuggestions(); return; }
+      searchTimer = setTimeout(function () { searchPlaces(q); }, 250);
+    });
+    locationInput.addEventListener('keydown', function (e) {
+      if (!suggestionsEl.classList.contains('open')) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        var n = suggestions.length;
+        activeSuggestion = (activeSuggestion + (e.key === 'ArrowDown' ? 1 : -1) + n) % n;
+        renderSuggestions();
+      } else if (e.key === 'Enter' && activeSuggestion >= 0) {
+        e.preventDefault();
+        pickSuggestion(suggestions[activeSuggestion]);
+      } else if (e.key === 'Escape') {
+        closeSuggestions();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!suggestionsEl.contains(e.target) && e.target !== locationInput) closeSuggestions();
+    });
+
+    function closeSuggestions() {
+      suggestionsEl.classList.remove('open');
+      activeSuggestion = -1;
+    }
+
+    function searchPlaces(q) {
+      var seq = ++searchSeq;
+      var url = 'https://api.mapbox.com/search/searchbox/v1/suggest?q=' + encodeURIComponent(q) +
+        '&access_token=' + MAPBOX_TOKEN + '&session_token=' + searchSession +
+        '&types=poi,address,street&limit=10';
+      if (userPosition) {
+        var ll = userPosition.lng + ',' + userPosition.lat;
+        url += '&proximity=' + ll + '&origin=' + ll;
+      }
+      fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('suggest ' + r.status);
+        return r.json();
+      }).then(function (json) {
+        var list = (json.suggestions || []).filter(function (s) {
+          return s.feature_type !== 'brand' && s.feature_type !== 'category';
+        }).map(function (s) {
+          return {
+            id: s.mapbox_id,
+            name: s.name || '',
+            address: s.full_address || s.place_formatted || s.address || '',
+            distance: typeof s.distance === 'number' ? s.distance : null
+          };
+        });
+        return list.length ? list : geocodeFallback(q);
+      }).catch(function () {
+        return geocodeFallback(q);
+      }).then(function (list) {
+        if (seq !== searchSeq) return;
+        suggestions = sortByDistance(list || []);
+        activeSuggestion = -1;
+        renderSuggestions();
+      });
+    }
+
+    function geocodeFallback(q) {
+      var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?access_token=' +
+        MAPBOX_TOKEN + '&autocomplete=true&types=poi,address,neighborhood&limit=6';
+      if (userPosition) url += '&proximity=' + userPosition.lng + ',' + userPosition.lat;
+      return fetch(url).then(function (r) { return r.json(); }).then(function (json) {
+        return (json.features || []).map(function (f) {
+          var lat = f.center[1], lng = f.center[0];
+          var name = f.text || '';
+          var address = (f.place_name || '').replace(new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ',\\s*'), '');
+          return {
+            id: null,
+            name: name,
+            address: address,
+            lat: lat,
+            lng: lng,
+            distance: userPosition ? distanceMeters(userPosition, { lat: lat, lng: lng }) : null
+          };
+        });
+      }).catch(function () { return []; });
+    }
+
+    function sortByDistance(list) {
+      return list.map(function (s, i) { return { s: s, i: i }; }).sort(function (a, b) {
+        var da = a.s.distance, dbb = b.s.distance;
+        if (da == null && dbb == null) return a.i - b.i;
+        if (da == null) return 1;
+        if (dbb == null) return -1;
+        return da - dbb || a.i - b.i;
+      }).map(function (x) { return x.s; });
+    }
+
+    function renderSuggestions() {
+      if (suggestions.length === 0) {
+        suggestionsEl.innerHTML = '<div class="suggestion"><span class="addr">No places found.</span></div>';
+      } else {
+        suggestionsEl.innerHTML = suggestions.map(function (s, i) {
+          return '<div class="suggestion' + (i === activeSuggestion ? ' active' : '') + '" data-i="' + i + '">' +
+            '<div><div>' + escapeHtml(s.name) + '</div><div class="addr">' + escapeHtml(s.address) + '</div></div>' +
+            '<div class="dist">' + formatDistance(s.distance) + '</div></div>';
+        }).join('');
+        suggestionsEl.querySelectorAll('[data-i]').forEach(function (el) {
+          el.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            pickSuggestion(suggestions[Number(el.dataset.i)]);
+          });
+        });
+      }
+      suggestionsEl.classList.add('open');
+    }
+
+    function combinedLocation(name, address) {
+      if (!address) return name;
+      if (!name || address.indexOf(name) === 0) return address;
+      return name + ', ' + address;
+    }
+
+    function pickSuggestion(s) {
+      closeSuggestions();
+      if (!s) return;
+      if (s.lat != null && s.lng != null) return applyLocation(s.name, s.address, s.lat, s.lng);
+      var url = 'https://api.mapbox.com/search/searchbox/v1/retrieve/' + encodeURIComponent(s.id) +
+        '?access_token=' + MAPBOX_TOKEN + '&session_token=' + searchSession;
+      fetch(url).then(function (r) { return r.json(); }).then(function (json) {
+        var f = (json.features || [])[0];
+        if (!f) throw new Error('No location details.');
+        var p = f.properties || {};
+        var coords = (p.coordinates && p.coordinates.latitude != null)
+          ? { lat: p.coordinates.latitude, lng: p.coordinates.longitude }
+          : { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] };
+        applyLocation(p.name || s.name, p.full_address || p.place_formatted || s.address, coords.lat, coords.lng);
+        searchSession = uuidv4();
+      }).catch(function () {
+        showBanner('error', 'Could not load that location. Please pick another result.');
+      });
+    }
+
+    function applyLocation(name, address, lat, lng) {
+      var text = combinedLocation(name, address);
+      locationInput.value = text;
+      selectedLocation = { text: text, lat: lat, lng: lng };
+      pickedEl.style.display = 'block';
+    }
+
+    // ---------------------------------------------------------------
+    // Photos (resized in the browser before upload)
+    // ---------------------------------------------------------------
+    var photos = []; // { blob, url }
+    var coverIndex = 0;
+    var photoInput = document.getElementById('photo-input');
+    var photoGrid = document.getElementById('photo-grid');
+
+    function renderPhotos() {
+      photoGrid.innerHTML = '';
+      photos.forEach(function (p, i) {
+        var div = document.createElement('div');
+        div.className = 'photo' + (i === coverIndex ? ' cover' : '');
+        div.innerHTML = '<img alt="">' + (i === coverIndex ? '<span class="cover-tag">COVER</span>' : '') +
+          '<button type="button" class="remove" aria-label="Remove photo">&times;</button>';
+        div.querySelector('img').src = p.url;
+        div.addEventListener('click', function () { coverIndex = i; renderPhotos(); });
+        div.querySelector('.remove').addEventListener('click', function (e) {
+          e.stopPropagation();
+          URL.revokeObjectURL(p.url);
+          photos.splice(i, 1);
+          if (coverIndex >= photos.length) coverIndex = Math.max(0, photos.length - 1);
+          else if (i < coverIndex) coverIndex--;
+          renderPhotos();
+        });
+        photoGrid.appendChild(div);
+      });
+      if (photos.length < MAX_PHOTOS) {
+        var add = document.createElement('div');
+        add.className = 'photo-add';
+        add.innerHTML = '<span class="material-icons">add_a_photo</span>Add photos';
+        add.addEventListener('click', function () { photoInput.click(); });
+        photoGrid.appendChild(add);
+      }
+    }
+
+    function resizeImage(file) {
+      return new Promise(function (resolve) {
+        var img = new Image();
+        var src = URL.createObjectURL(file);
+        img.onload = function () {
+          var max = 1600;
+          var scale = Math.min(1, max / Math.max(img.width, img.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(src);
+          canvas.toBlob(function (blob) { resolve(blob || file); }, 'image/jpeg', 0.85);
+        };
+        img.onerror = function () { URL.revokeObjectURL(src); resolve(null); };
+        img.src = src;
+      });
+    }
+
+    photoInput.addEventListener('change', function () {
+      var files = Array.prototype.slice.call(photoInput.files || [], 0, MAX_PHOTOS - photos.length);
+      photoInput.value = '';
+      Promise.all(files.map(resizeImage)).then(function (blobs) {
+        blobs.forEach(function (blob) {
+          if (blob) photos.push({ blob: blob, url: URL.createObjectURL(blob) });
+        });
+        renderPhotos();
+      });
+    });
+    renderPhotos();
+
+    // ---------------------------------------------------------------
+    // Chips, activities, links
+    // ---------------------------------------------------------------
+    function chipGroup(containerId, attr, onChange) {
+      var container = document.getElementById(containerId);
+      container.addEventListener('click', function (e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        container.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('selected', c === chip); });
+        onChange(chip.dataset[attr]);
+      });
+    }
+
+    var costTier = '$$';
+    var environment = 'outdoor';
+    var parkingType = 1;
+    chipGroup('cost-chips', 'cost', function (v) { costTier = v; });
+    chipGroup('env-chips', 'env', function (v) { environment = v; });
+    chipGroup('parking-chips', 'parking', function (v) { parkingType = Number(v); });
+
+    var repeatSelect = document.getElementById('ev-repeat');
+    repeatSelect.addEventListener('change', function () {
+      document.getElementById('ev-custom-repeat-wrap').style.display = repeatSelect.value === 'Custom...' ? 'block' : 'none';
+    });
+
+    function addActivityRow() {
+      var row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = '<input type="text" class="act-name" placeholder="Activity (e.g. yoga)">' +
+        '<input type="text" class="act-gear" placeholder="Gear to bring, comma separated">' +
+        '<button type="button" class="icon-btn" aria-label="Remove">&times;</button>';
+      row.querySelector('button').addEventListener('click', function () { row.remove(); });
+      document.getElementById('activity-list').appendChild(row);
+    }
+
+    function addLinkRow() {
+      var row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = '<input type="text" class="link-label" placeholder="Label (e.g. Tickets)" style="flex:0.6;">' +
+        '<input type="url" class="link-url" placeholder="https://">' +
+        '<button type="button" class="icon-btn" aria-label="Remove">&times;</button>';
+      row.querySelector('button').addEventListener('click', function () { row.remove(); });
+      document.getElementById('link-list').appendChild(row);
+    }
+
+    document.getElementById('add-activity').addEventListener('click', addActivityRow);
+    document.getElementById('add-link').addEventListener('click', addLinkRow);
+    addActivityRow();
+
+    // Default the date to today (local).
+    (function () {
+      var d = new Date();
+      document.getElementById('ev-date').value = d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    })();
+
+    // "18:30" -> "6:30 PM" (the app's TimeOfDay.format output).
+    function formatTime(value) {
+      var parts = value.split(':');
+      var h = Number(parts[0]), m = parts[1];
+      var suffix = h >= 12 ? 'PM' : 'AM';
+      var h12 = h % 12 === 0 ? 12 : h % 12;
+      return h12 + ':' + m + ' ' + suffix;
+    }
+
+    function normalizeUrl(url) {
+      if (!url) return '';
+      return /^https?:\/\//i.test(url) ? url : 'https://' + url;
+    }
+
+    // ---------------------------------------------------------------
+    // Submit event (mirrors EventFormContent._submitEvent)
+    // ---------------------------------------------------------------
+    document.getElementById('event-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      hideBanner();
+      var title = document.getElementById('ev-title').value.trim();
+      var dateValue = document.getElementById('ev-date').value;
+      var startValue = document.getElementById('ev-start').value;
+      var endValue = document.getElementById('ev-end').value;
+
+      if (!title) return showBanner('warning', 'Please enter an event title.');
+      if (!selectedLocation || !locationInput.value.trim()) {
+        return showBanner('warning', 'Please select a location from the search results.');
+      }
+      if (photos.length === 0) return showBanner('warning', 'Please add at least one photo.');
+      if (!dateValue || !startValue || !endValue) return showBanner('warning', 'Please choose a date, start time and end time.');
+
+      var dateParts = dateValue.split('-').map(Number);
+      var eventDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+      var customRepeat = repeatSelect.value === 'Custom...'
+        ? (document.getElementById('ev-custom-repeat').value.trim() || null)
+        : null;
+      if (repeatSelect.value === 'Custom...' && !customRepeat) {
+        return showBanner('warning', 'Describe the custom repeat, or pick another repeat option.');
+      }
+
+      var activities = [];
+      document.querySelectorAll('#activity-list .list-row').forEach(function (row) {
+        var name = row.querySelector('.act-name').value.trim().toLowerCase();
+        if (!name) return;
+        var gear = row.querySelector('.act-gear').value.split(',')
+          .map(function (g) { return g.trim(); })
+          .filter(function (g) { return g; });
+        activities.push({ activityName: name, gear: gear });
+      });
+
+      var links = [];
+      document.querySelectorAll('#link-list .list-row').forEach(function (row) {
+        var url = normalizeUrl(row.querySelector('.link-url').value.trim());
+        if (!url) return;
+        links.push({ label: row.querySelector('.link-label').value.trim() || 'Link', url: url });
+      });
+
+      var uid = currentUser.uid;
+      var eventId = uuidv4();
+      var btn = document.getElementById('btn-create-event');
+      btn.disabled = true;
+      setLoading(true, 'Uploading photos\u2026');
+
+      // Cover photo first, matching the app.
+      var ordered = [photos[coverIndex]].concat(photos.filter(function (_, i) { return i !== coverIndex; }));
+      var base = Date.now();
+      Promise.all(ordered.map(function (p, i) {
+        var ref = storage.ref().child('events/' + eventId + '/' + uid + '/' + (base + i));
+        return ref.put(p.blob, { contentType: p.blob.type || 'image/jpeg' }).then(function (snap) {
+          return snap.ref.getDownloadURL();
+        });
+      })).then(function (imageUrls) {
+        setLoading(true, 'Posting your event\u2026');
+        return db.collection('spots')
+          .where('location', '==', selectedLocation.text)
+          .where('isClaimed', '==', true)
+          .limit(1)
+          .get()
+          .catch(function () { return null; })
+          .then(function (matching) {
+            var data = {
+              creator: uid,
+              creatorId: uid,
+              createdBy: {
+                uid: uid,
+                displayName: currentUser.displayName || '',
+                photoUrl: currentUser.photoURL || ''
+              },
+              eventId: eventId,
+              title: title.substring(0, 100),
+              location: selectedLocation.text,
+              latitude: selectedLocation.lat,
+              longitude: selectedLocation.lng,
+              description: document.getElementById('ev-description').value.trim(),
+              imageUrls: imageUrls,
+              coverImage: imageUrls[0],
+              date: firebase.firestore.Timestamp.fromDate(eventDate),
+              startTime: formatTime(startValue),
+              endTime: formatTime(endValue),
+              recurrence: { repeatOption: repeatSelect.value, customValue: customRepeat },
+              cost: {
+                isFree: costTier === 'Free',
+                tier: costTier,
+                notes: document.getElementById('ev-cost-notes').value.trim()
+              },
+              isOutdoors: environment !== 'indoor',
+              environment: environment,
+              parkingType: parkingType,
+              activities: activities,
+              links: links,
+              createdAt: FieldValue.serverTimestamp()
+            };
+            if (matching && !matching.empty) data.locationSpotId = matching.docs[0].id;
+            return db.collection('events').doc(eventId).set(data);
+          });
+      }).then(function () {
+        setLoading(false);
+        resetEventForm();
+        showBanner('success', 'Your event "' + title + '" is live on Varably! Manage it from the Pro Dashboard or the app.');
+      }).catch(function (err) {
+        console.error('Event creation failed', err);
+        setLoading(false);
+        showBanner('error', 'Could not post your event: ' + (err.message || err.code || 'unknown error'));
+      }).finally(function () {
+        btn.disabled = false;
+      });
+    });
+
+    function resetEventForm() {
+      document.getElementById('event-form').reset();
+      photos.forEach(function (p) { URL.revokeObjectURL(p.url); });
+      photos = [];
+      coverIndex = 0;
+      renderPhotos();
+      selectedLocation = null;
+      pickedEl.style.display = 'none';
+      document.getElementById('activity-list').innerHTML = '';
+      document.getElementById('link-list').innerHTML = '';
+      addActivityRow();
+      document.getElementById('ev-custom-repeat-wrap').style.display = 'none';
+      [['cost-chips', '$$'], ['env-chips', 'outdoor'], ['parking-chips', '1']].forEach(function (pair) {
+        document.querySelectorAll('#' + pair[0] + ' .chip').forEach(function (c) {
+          var v = c.dataset.cost || c.dataset.env || c.dataset.parking;
+          c.classList.toggle('selected', v === pair[1]);
+        });
+      });
+      costTier = '$$';
+      environment = 'outdoor';
+      parkingType = 1;
+      var d = new Date();
+      document.getElementById('ev-date').value = d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // ---------------------------------------------------------------
+    // Claim a spot (mirrors ClaimSpotButton: writes a pending spot_claims doc)
+    // ---------------------------------------------------------------
+    var businessSpots = [];
+    var myClaimsBySpot = {};
+    var claimSearch = document.getElementById('claim-search');
+    var claimResults = document.getElementById('claim-results');
+    var claimTarget = null;
+
+    function loadClaimableSpots() {
+      db.collection('spots').where('spotType', '==', 'business').get().then(function (snap) {
+        businessSpots = [];
+        snap.forEach(function (doc) {
+          var d = doc.data();
+          if (d.isArchived === true) return;
+          businessSpots.push({
+            id: doc.id,
+            title: d.title || 'Untitled',
+            location: d.location || '',
+            image: d.coverImage || (d.imageUrls && d.imageUrls[0]) || '',
+            isClaimed: d.isClaimed === true,
+            ownedByMe: d.isClaimed === true && d.creator === currentUser.uid
+          });
+        });
+        businessSpots.sort(function (a, b) { return a.title.localeCompare(b.title); });
+        renderClaimResults();
+      }).catch(function (err) {
+        console.error('Could not load spots', err);
+        claimResults.innerHTML = '<div class="empty">Could not load spots. Please refresh.</div>';
+      });
+    }
+
+    claimSearch.addEventListener('input', renderClaimResults);
+
+    function renderClaimResults() {
+      var q = claimSearch.value.trim().toLowerCase();
+      if (!q) {
+        claimResults.innerHTML = '<div class="empty">Start typing to find your business.</div>';
+        return;
+      }
+      var matches = businessSpots.filter(function (s) {
+        return s.title.toLowerCase().indexOf(q) >= 0 || s.location.toLowerCase().indexOf(q) >= 0;
+      }).slice(0, 25);
+      if (matches.length === 0) {
+        claimResults.innerHTML = '<div class="empty">No business spots match "' + escapeHtml(claimSearch.value.trim()) + '".</div>';
+        return;
+      }
+      claimResults.innerHTML = '';
+      matches.forEach(function (spot) {
+        var claim = myClaimsBySpot[spot.id];
+        var label, disabled = true;
+        if (spot.ownedByMe) label = 'Yours';
+        else if (spot.isClaimed) label = 'Claimed';
+        else if (claim && claim.status === 'pending') label = 'Pending review';
+        else { label = 'Claim'; disabled = false; }
+
+        var row = document.createElement('div');
+        row.className = 'spot-result';
+        row.innerHTML = (spot.image ? '<img class="spot-thumb" alt="">' : '<div class="spot-thumb"></div>') +
+          '<div class="spot-info"><div class="spot-title"></div><div class="spot-loc"></div></div>' +
+          '<button type="button" class="btn-claim"></button>';
+        if (spot.image) {
+          var img = row.querySelector('img');
+          img.src = spot.image;
+          img.onerror = function () { img.style.visibility = 'hidden'; };
+        }
+        row.querySelector('.spot-title').textContent = spot.title;
+        row.querySelector('.spot-loc').textContent = spot.location;
+        var btn = row.querySelector('.btn-claim');
+        btn.textContent = label;
+        btn.disabled = disabled;
+        if (!disabled) btn.addEventListener('click', function () { openClaimModal(spot); });
+        claimResults.appendChild(row);
+      });
+    }
+
+    function watchMyClaims() {
+      db.collection('spot_claims').where('claimedByUid', '==', currentUser.uid).onSnapshot(function (snap) {
+        myClaimsBySpot = {};
+        var claims = [];
+        snap.forEach(function (doc) {
+          var d = doc.data();
+          claims.push(d);
+          var prev = myClaimsBySpot[d.spotId];
+          // A pending request wins over older reviewed ones for the same spot.
+          if (!prev || d.status === 'pending') myClaimsBySpot[d.spotId] = d;
+        });
+        claims.sort(function (a, b) {
+          return ((b.createdAt && b.createdAt.toMillis()) || Date.now()) - ((a.createdAt && a.createdAt.toMillis()) || Date.now());
+        });
+        renderMyClaims(claims);
+        renderClaimResults();
+      }, function (err) { console.error('Claims stream error', err); });
+    }
+
+    function renderMyClaims(claims) {
+      var el = document.getElementById('my-claims');
+      if (claims.length === 0) {
+        el.innerHTML = '<div class="empty">No claim requests yet.</div>';
+        return;
+      }
+      el.innerHTML = '';
+      claims.forEach(function (c) {
+        var status = c.status === 'approved' || c.status === 'rejected' ? c.status : 'pending';
+        var text = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Not approved' : 'Pending review';
+        var row = document.createElement('div');
+        row.className = 'spot-result';
+        row.innerHTML = '<div class="spot-info"><div class="spot-title"></div><div class="spot-loc"></div></div>' +
+          '<span class="status-tag ' + status + '">' + text + '</span>';
+        row.querySelector('.spot-title').textContent = c.spotTitle || 'Spot';
+        row.querySelector('.spot-loc').textContent = c.createdAt && c.createdAt.toDate
+          ? 'Submitted ' + c.createdAt.toDate().toLocaleDateString()
+          : 'Submitted just now';
+        if (status === 'approved') {
+          var link = document.createElement('a');
+          link.href = 'varably_payment.html?spot=' + encodeURIComponent(c.spotId);
+          link.textContent = 'Choose a plan';
+          link.style.cssText = 'font-size:0.8rem;font-weight:700;margin-right:0.5rem;white-space:nowrap;';
+          row.insertBefore(link, row.lastChild);
+        }
+        el.appendChild(row);
+      });
+    }
+
+    var claimModal = document.getElementById('claim-modal');
+    var claimError = document.getElementById('claim-error');
+
+    function openClaimModal(spot) {
+      claimTarget = spot;
+      document.getElementById('claim-modal-title').textContent = 'Claim "' + spot.title + '"';
+      document.getElementById('claim-name').value = currentUser.displayName || '';
+      document.getElementById('claim-phone').value = '';
+      document.getElementById('claim-role').value = '';
+      document.getElementById('claim-notes').value = '';
+      claimError.textContent = '';
+      claimModal.classList.add('open');
+    }
+
+    document.getElementById('claim-cancel').addEventListener('click', function () {
+      claimModal.classList.remove('open');
+    });
+
+    document.getElementById('claim-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fullName = document.getElementById('claim-name').value.trim();
+      var phone = document.getElementById('claim-phone').value.trim();
+      var role = document.getElementById('claim-role').value.trim();
+      var notes = document.getElementById('claim-notes').value.trim();
+      if (!fullName || !phone || !role) {
+        claimError.textContent = 'Full name, phone number and role are required.';
+        return;
+      }
+      var spot = claimTarget;
+      var submitBtn = document.getElementById('claim-submit');
+      submitBtn.disabled = true;
+      db.collection('spot_claims').add({
+        spotId: spot.id,
+        spotTitle: spot.title,
+        claimedByUid: currentUser.uid,
+        claimedByEmail: currentUser.email || '',
+        fullName: fullName,
+        phone: phone,
+        role: role,
+        notes: notes,
+        status: 'pending',
+        createdAt: FieldValue.serverTimestamp()
+      }).then(function () {
+        claimModal.classList.remove('open');
+        showBanner('success', 'Claim submitted for "' + spot.title + '". We\'ll review it and email you once it\'s approved.');
+      }).catch(function (err) {
+        claimError.textContent = 'Could not submit claim: ' + (err.message || err.code);
+      }).finally(function () {
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

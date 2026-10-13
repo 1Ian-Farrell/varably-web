@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Varably Pro | Business Packages</title>
+  <title>Varably | Business Plans</title>
   <link rel="icon" type="image/png" href="Varably_Icon_Blue_Orange.png">
   <style>
     :root {
@@ -36,10 +36,21 @@
       align-items: center;
     }
 
+    a { color: #a5b4fc; }
+
+    .top-links {
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
     .header {
       text-align: center;
-      max-width: 600px;
-      margin-bottom: 3rem;
+      max-width: 640px;
+      margin-bottom: 2.5rem;
     }
 
     .header h1 {
@@ -49,6 +60,7 @@
       margin-bottom: 0.5rem;
       background: linear-gradient(135deg, #a5b4fc, #6366f1);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -57,13 +69,29 @@
       font-size: 1.1rem;
     }
 
+    .section-title {
+      max-width: 1100px;
+      width: 100%;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 3rem 0 0.4rem;
+    }
+
+    .section-sub {
+      max-width: 1100px;
+      width: 100%;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
       max-width: 1100px;
       width: 100%;
-      align-items: start;
+      align-items: stretch;
     }
 
     .card {
@@ -76,6 +104,8 @@
       position: relative;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
+
+    .card.current { border-color: var(--accent); }
 
     .account-bar {
       display: flex;
@@ -98,13 +128,9 @@
       margin-right: 0.5rem;
     }
 
-    .account-bar .muted {
+    .muted {
       color: var(--text-muted);
       font-size: 0.9rem;
-    }
-
-    .account-bar a {
-      color: #a5b4fc;
     }
 
     select {
@@ -133,12 +159,13 @@
     .banner.info { background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.4); }
 
     .status-pill {
+      align-self: flex-start;
       display: inline-block;
       font-size: 0.75rem;
       font-weight: 600;
       padding: 3px 10px;
       border-radius: 9999px;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       background: rgba(148, 163, 184, 0.15);
       color: var(--text-muted);
     }
@@ -146,38 +173,6 @@
     .status-pill.active {
       background: rgba(16, 185, 129, 0.15);
       color: var(--accent);
-    }
-
-    .boost-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .boost-form label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    .boost-form select { width: 100%; }
-
-    .price-summary {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-top: 1px solid var(--card-border);
-      padding-top: 0.85rem;
-      margin-bottom: 1.25rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .price-summary strong {
-      color: var(--text-main);
-      font-size: 1.35rem;
     }
 
     .fine-print {
@@ -203,7 +198,7 @@
     .price-tag {
       font-size: 2.75rem;
       font-weight: 800;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       display: flex;
       align-items: baseline;
       gap: 0.25rem;
@@ -251,21 +246,37 @@
       transition: background 0.2s ease, transform 0.1s ease;
     }
 
-    .btn:hover {
-      background: var(--primary-hover);
-    }
+    .btn:hover { background: var(--primary-hover); }
 
     .btn:disabled {
       background: var(--disabled-text);
       cursor: not-allowed;
     }
 
-    /* Schedule Selector Styles */
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      margin-top: 0.6rem;
+      padding: 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .btn.secondary:hover { border-color: #ef4444; color: #fca5a5; }
+
+    /* Blast calendar */
+    .blast-card { max-width: 1100px; width: 100%; }
+
+    .blast-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(300px, 1.4fr);
+      gap: 2rem;
+    }
+
     .schedule-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 1rem;
       margin-bottom: 0.75rem;
     }
 
@@ -289,7 +300,7 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 6px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .day-slot {
@@ -315,11 +326,7 @@
       cursor: not-allowed;
     }
 
-    .day-slot.mine .price-label {
-      color: #a5b4fc;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-    }
+    .day-slot.mine .price-label { color: #a5b4fc; font-size: 0.65rem; text-transform: uppercase; }
 
     .day-slot.booked {
       background: rgba(239, 68, 68, 0.15);
@@ -339,174 +346,101 @@
       display: block;
     }
 
-    .day-slot .date-num {
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin: 2px 0;
-    }
-
-    .day-slot .price-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-    }
-
-    .day-slot.booked .price-label {
-      color: #ef4444;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-    }
+    .day-slot .date-num { display: block; font-size: 0.9rem; font-weight: 700; margin: 2px 0; }
+    .day-slot .price-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--accent); }
+    .day-slot.booked .price-label { color: #ef4444; font-size: 0.65rem; text-transform: uppercase; }
 
     .legend {
       display: flex;
+      flex-wrap: wrap;
       gap: 12px;
       font-size: 0.75rem;
       color: var(--text-muted);
       margin-bottom: 1rem;
     }
 
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .field-label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 1rem 0 0.35rem;
     }
 
-    .legend-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+    .field-label + select { width: 100%; }
+
+    @media (max-width: 760px) {
+      .header h1 { font-size: 2rem; }
+      .blast-layout { grid-template-columns: 1fr; }
+      .card { padding: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
+  <div class="top-links">
+    <a href="index.html">&larr; Varably</a>
+    <span><a href="create.html">Create event / claim spot</a> &nbsp;&middot;&nbsp; <a href="pro-dashboard.html">Pro Dashboard</a></span>
+  </div>
+
   <div class="header">
     <h1>Grow Your Business with Varably</h1>
-    <p>Every business gets every tool. Mix and match proximity alerts, citywide blasts, and feed boosts for any spot or event you manage.</p>
+    <p>Simple monthly plans for every claimed spot. Start free, then add daily specials, analytics, proximity alerts and more as you grow.</p>
   </div>
 
   <div id="banner" class="banner" role="status"></div>
 
   <div class="account-bar">
     <div id="account-signed-out">
-      <span class="muted">Sign in with your Varably business account to purchase.</span>
+      <span class="muted">Sign in with your Varably business account to choose a plan.</span>
       <a href="pro-dashboard-sign-in.html?next=varably_payment.html">Sign in</a>
     </div>
     <div id="account-signed-in" style="display:none;">
-      <label for="listing-select">Promoting</label>
-      <select id="listing-select" aria-label="Spot or event to promote"></select>
-      <span id="no-listings" class="muted" style="display:none;">Claim a spot or create an event in the Varably app to get started.</span>
+      <label for="spot-select">Plan for</label>
+      <select id="spot-select" aria-label="Claimed spot"></select>
+      <span id="no-spots" class="muted" style="display:none;">You don't have a claimed spot yet. <a href="create.html#claim">Claim your spot</a> to choose a plan.</span>
     </div>
     <div class="muted" id="account-email"></div>
   </div>
 
-  <div class="pricing-grid">
+  <div class="pricing-grid" id="plans-grid"></div>
 
-    <!-- Proximity alerts (monthly, per listing) -->
-    <div class="card">
-      <h2 class="card-title">Proximity Alerts</h2>
-      <p class="card-subtitle">Automated proximity marketing to engage nearby mobile app users.</p>
+  <h2 class="section-title">Citywide Blast Notification</h2>
+  <p class="section-sub">An add-on for any plan. Dominate your city for a day: only one notification slot is sold per day across the entire city.</p>
 
-      <div class="price-tag">
-        $30 <span class="period">/ month per listing</span>
+  <div class="card blast-card">
+    <div class="blast-layout">
+      <div>
+        <h3 class="card-title">Book a Blast</h3>
+        <p class="card-subtitle" style="min-height:0;">Promote any spot or event you manage in <span id="market-name">Boston</span>. Pro spots can book up to 8 weeks out.</p>
+        <div id="market-picker" style="display:none;">
+          <label class="field-label" for="market-select">City</label>
+          <select id="market-select" aria-label="City"></select>
+        </div>
+        <label class="field-label" for="listing-select">Spot or event to promote</label>
+        <select id="listing-select" aria-label="Spot or event to promote"></select>
+        <p class="muted" id="no-listings" style="display:none; margin-top:0.5rem;">Create an event or claim a spot first. <a href="create.html">Get started</a></p>
+        <div style="margin-top:1.5rem;">
+          <button class="btn" id="btn-blast" disabled>Select an available day</button>
+          <p class="fine-print" id="blast-fine-print">Sent at noon local time to Varably users around the city. Refundable until the 48h cutoff.</p>
+        </div>
       </div>
-      <span id="geofence-status" class="status-pill">Not active</span>
-
-      <ul class="features-list">
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>0.5-Mile Geofence Radius</strong> — Send automated push notifications to users near your location.
-        </li>
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>Pro Analytics Dashboard</strong> — Track impressions, alerts delivered, and user engagement metrics.
-        </li>
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>Customized Offers</strong> — Update notification content and promotions anytime.
-        </li>
-      </ul>
-
-      <button class="btn" id="btn-geofence">Start Proximity Alerts</button>
-      <p class="fine-print">Billed monthly. Cancel anytime from the Pro Dashboard.</p>
+      <div>
+        <div class="schedule-header">
+          <h4 id="schedule-title">14-Day Schedule</h4>
+          <span class="rule-notice">Closes 48h in advance</span>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background: var(--accent);"></div> Available</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Booked</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--primary);"></div> Yours</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--disabled-text);"></div> Cutoff / Locked</div>
+        </div>
+      </div>
     </div>
-
-    <!-- Card 2: Exclusive Daily Blast -->
-    <div class="card">
-      <h2 class="card-title">Citywide Blast Notification</h2>
-      <p class="card-subtitle">Dominate <span id="market-name">Boston</span> for a day. Only 1 notification slot available per day across the entire city.</p>
-      <div id="market-picker" style="display:none; margin-bottom:1rem;">
-        <select id="market-select" aria-label="City"></select>
-      </div>
-
-      <div class="schedule-header">
-        <h4>14-Day Schedule</h4>
-        <span class="rule-notice">Closes 48h in advance</span>
-      </div>
-
-      <div class="calendar-grid" id="calendar-grid">
-      </div>
-
-      <div class="legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background: var(--accent);"></div> Available
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background: #ef4444;"></div> Booked
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background: var(--disabled-text);"></div> Cutoff / Locked
-        </div>
-      </div>
-
-      <button class="btn" id="btn-blast" disabled>Select an available day</button>
-      <p class="fine-print" id="blast-fine-print">Sent at noon local time to Varably users around the city. Refundable until the 48h cutoff.</p>
-    </div>
-
-    <!-- Card 3: Feed Boost (time-boxed) -->
-    <div class="card">
-      <h2 class="card-title">Feed Boost</h2>
-      <p class="card-subtitle">Lift a spot or event higher in nearby users' discovery feeds for a set period of time.</p>
-
-      <div class="price-tag">
-        $2 <span class="period">/ day and up</span>
-      </div>
-      <span id="boost-status" class="status-pill">Not boosted</span>
-
-      <ul class="features-list">
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>Boost Spots &amp; Events</strong> &mdash; Promote any listing you manage, from your storefront to this weekend's event.
-        </li>
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>You Pick the Window</strong> &mdash; Run a boost for 3, 7, 14, or 30 days. It ends automatically.
-        </li>
-        <li>
-          <svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-          <strong>Relevance-Safe Ranking</strong> &mdash; Higher daily amounts earn a bigger lift without burying what's genuinely nearby.
-        </li>
-      </ul>
-
-      <div class="boost-form">
-        <div>
-          <label for="boost-bid">Daily amount</label>
-          <select id="boost-bid"></select>
-        </div>
-        <div>
-          <label for="boost-days">Duration</label>
-          <select id="boost-days"></select>
-        </div>
-      </div>
-      <div class="price-summary">
-        <span>Total</span>
-        <strong id="boost-total">$35.00</strong>
-      </div>
-
-      <button class="btn" id="btn-boost">Boost for $35.00</button>
-      <p class="fine-print">One-time charge. Buying the same daily amount again extends a running boost.</p>
-    </div>
-
   </div>
 
   <!-- Firebase (vaycayauth project) -->
@@ -527,71 +461,112 @@
     });
     var auth = firebase.auth();
     var db = firebase.firestore();
-    var createCheckout = firebase.functions().httpsCallable('createCheckout');
-    var listMarkets = firebase.functions().httpsCallable('listMarkets');
+    var functions = firebase.functions();
+    var createCheckout = functions.httpsCallable('createCheckout');
+    var cancelFeature = functions.httpsCallable('cancelFeature');
+    var listMarkets = functions.httpsCallable('listMarkets');
 
     // Display copy of functions/src/pricing.ts; the server recomputes every charge.
     var PRICING = {
-      boostBidTiersCents: [200, 500, 1000, 2000],
-      boostDurationDays: [3, 7, 14, 30],
+      starterMonthlyCents: 3900,
+      proMonthlyCents: 12900,
       blastWindowDays: 14,
-      blastCutoffDays: 2
+      blastWindowDaysPro: 56,
+      blastCutoffDays: 2,
+      eventGeofencePriceCents: 5000
     };
+    var ACTIVE_PLAN_STATUSES = ['active', 'active_beta', 'canceling'];
+
+    var CHECK_SVG = '<svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>';
+
+    var PLANS = [
+      {
+        tier: 'free',
+        name: 'Free',
+        subtitle: 'A verified listing for every business that claims its spot.',
+        cents: 0,
+        period: '/ month',
+        finePrint: 'Included with every claimed spot.',
+        features: [
+          ['Claimed Business Card', 'A verified, static card for your spot.'],
+          ['Core Details', 'Title, description, location and hours of operation.'],
+          ['Photos & Events', 'Show off your space and the events happening there.'],
+          ['Spot Status', 'Activity chips, parking, environment and more.']
+        ]
+      },
+      {
+        tier: 'starter',
+        name: 'Starter',
+        subtitle: 'Keep customers in the loop with daily specials and real engagement data.',
+        cents: PRICING.starterMonthlyCents,
+        period: '/ month per spot',
+        finePrint: 'Billed monthly per spot. Switch or cancel anytime; changes are prorated.',
+        features: [
+          ['Everything in Free', null],
+          ['Daily Specials Button', 'A pulsing button on your spot card. Post unlimited updates and delete them anytime.'],
+          ['Basic Analytics', 'Track core engagement metrics for your spot.'],
+          ['Official Event Tags', 'Choose which events at your location get the official mark.']
+        ]
+      },
+      {
+        tier: 'pro',
+        name: 'Pro',
+        subtitle: 'Grow your business and unlock free event geofences for events at your Pro spot.',
+        cents: PRICING.proMonthlyCents,
+        period: '/ month per spot',
+        finePrint: 'Billed monthly per spot. Switch or cancel anytime; changes are prorated.',
+        features: [
+          ['Everything in Starter', null],
+          ['Event Geofenced Notifications', 'Unlimited events linked to your active Pro spot are included. Other events are $' + (PRICING.eventGeofencePriceCents / 100) + ' once per event and include event-specific daily visitor analytics.'],
+          ['Boost Rewards', 'Interested clicks on your official events lift your spot in the feed for 72 hours.'],
+          ['Schedule Ahead', 'Plan specials weeks in advance and book citywide blasts up to 8 weeks out.'],
+          ['Event Templates', 'Save past events in the app and reuse them for new ones.']
+        ]
+      }
+    ];
+    var TIER_NAMES = { free: 'Free', starter: 'Starter', pro: 'Pro' };
+
     // Launch market, used until listMarkets responds.
     var markets = [{ id: 'boston', name: 'Boston', sendHour: 12, blastPricesCents: [17500, 12500, 12500, 17500, 17500, 35000, 35000] }];
     var market = markets[0];
-    function blastPriceCents(date) {
-      return market.blastPricesCents[date.getDay()];
-    }
-    function slotId(dateIdValue) {
-      return market.id + '_' + dateIdValue;
-    }
-    function sendTimeLabel(hour) {
-      if (hour === 12) return 'noon';
-      return (hour % 12 === 0 ? 12 : hour % 12) + (hour < 12 ? ' AM' : ' PM');
-    }
 
     var currentUser = null;
-    var listings = [];
+    var spots = [];      // claimed spots (plans)
+    var listings = [];   // claimed spots + events (blasts)
+    var subsBySpotId = {};
     var slotsByDate = {};
-    var geofenceSubs = {};
     var selectedDateId = null;
+    var busy = false;
     var unsubscribers = [];
+    var slotsUnsubscribe = null;
+    var preselectSpotId = new URLSearchParams(window.location.search).get('spot');
 
     var els = {
       banner: document.getElementById('banner'),
       signedOut: document.getElementById('account-signed-out'),
       signedIn: document.getElementById('account-signed-in'),
       email: document.getElementById('account-email'),
+      spotSelect: document.getElementById('spot-select'),
+      noSpots: document.getElementById('no-spots'),
+      plansGrid: document.getElementById('plans-grid'),
       listingSelect: document.getElementById('listing-select'),
       noListings: document.getElementById('no-listings'),
-      geofenceStatus: document.getElementById('geofence-status'),
-      boostStatus: document.getElementById('boost-status'),
       calendar: document.getElementById('calendar-grid'),
-      boostBid: document.getElementById('boost-bid'),
-      boostDays: document.getElementById('boost-days'),
-      boostTotal: document.getElementById('boost-total'),
-      btnGeofence: document.getElementById('btn-geofence'),
-      btnBlast: document.getElementById('btn-blast'),
-      btnBoost: document.getElementById('btn-boost')
+      scheduleTitle: document.getElementById('schedule-title'),
+      btnBlast: document.getElementById('btn-blast')
     };
 
+    // ---- Helpers ------------------------------------------------------------
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
     function money(cents, decimals) {
       return '$' + (cents / 100).toFixed(decimals);
     }
     function dateId(d) {
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    }
-    function calendarDates() {
-      var today = new Date();
-      today.setHours(0, 0, 0, 0);
-      var dates = [];
-      for (var i = 0; i < PRICING.blastWindowDays; i++) {
-        var d = new Date(today);
-        d.setDate(today.getDate() + i);
-        dates.push(d);
-      }
-      return dates;
     }
     function toDate(value) {
       if (!value) return null;
@@ -599,15 +574,80 @@
       var parsed = new Date(value);
       return isNaN(parsed.getTime()) ? null : parsed;
     }
-    function selectedListing() {
-      return listings[Number(els.listingSelect.value)] || null;
-    }
     function showBanner(kind, text) {
       els.banner.className = 'banner show ' + kind;
       els.banner.textContent = text;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function goSignIn() {
       window.location.href = 'pro-dashboard-sign-in.html?next=varably_payment.html';
+    }
+    function sendTimeLabel(hour) {
+      if (hour === 12) return 'noon';
+      return (hour % 12 === 0 ? 12 : hour % 12) + (hour < 12 ? ' AM' : ' PM');
+    }
+    function blastPriceCents(date) {
+      return market.blastPricesCents[date.getDay()];
+    }
+    function slotId(dateIdValue) {
+      return market.id + '_' + dateIdValue;
+    }
+    function hasProSpot() {
+      return spots.some(function (s) { return planOf(s).tier === 'pro'; });
+    }
+    function blastWindowDays() {
+      return hasProSpot() ? PRICING.blastWindowDaysPro : PRICING.blastWindowDays;
+    }
+    function calendarDates() {
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      var dates = [];
+      for (var i = 0; i < blastWindowDays(); i++) {
+        var d = new Date(today);
+        d.setDate(today.getDate() + i);
+        dates.push(d);
+      }
+      return dates;
+    }
+    function selectedSpot() {
+      return spots[Number(els.spotSelect.value)] || null;
+    }
+    function selectedListing() {
+      return listings[Number(els.listingSelect.value)] || null;
+    }
+
+    // Current plan for a spot: the spot's businessTier plus its subscription doc.
+    function planOf(spot) {
+      var sub = spot ? subsBySpotId[spot.id] : null;
+      var live = sub && ACTIVE_PLAN_STATUSES.indexOf(sub.status) >= 0;
+      var tier = live ? (sub.tier === 'pro' ? 'pro' : 'starter')
+        : (spot && (spot.businessTier === 'pro' || spot.businessTier === 'starter') ? spot.businessTier : 'free');
+      return {
+        tier: tier,
+        status: live ? sub.status : null,
+        canceling: live && sub.status === 'canceling',
+        periodEnd: sub ? toDate(sub.currentPeriodEnd) : null,
+        beta: !!sub && sub.billingMode === 'beta'
+      };
+    }
+
+    function errorMessage(err) {
+      return (err && (err.message || err.code)) || 'Something went wrong.';
+    }
+
+    // Stripe Checkout when billing is live; otherwise fulfilled immediately (beta).
+    function runCheckout(payload) {
+      payload.returnUrl = window.location.origin + window.location.pathname;
+      return createCheckout(payload).then(function (result) {
+        var data = result.data || {};
+        if (data.status === 'requires_payment') {
+          if (typeof data.checkoutUrl !== 'string' || data.checkoutUrl.indexOf('https://checkout.stripe.com/') !== 0) {
+            throw new Error('Unexpected checkout response.');
+          }
+          window.location.assign(data.checkoutUrl);
+        }
+        return data;
+      });
     }
 
     // ---- Checkout return from Stripe -------------------------------------
@@ -615,7 +655,7 @@
       var params = new URLSearchParams(window.location.search);
       var result = params.get('checkout');
       if (result === 'success') {
-        showBanner('success', 'Payment received! Your purchase activates as soon as Stripe confirms it, usually within a few seconds. You can return to the Varably app.');
+        showBanner('success', 'Payment received! Your plan activates as soon as Stripe confirms it, usually within a few seconds. Your perks show up in the Varably app automatically.');
       } else if (result === 'canceled') {
         showBanner('info', 'Checkout canceled. Nothing was charged.');
       }
@@ -630,37 +670,232 @@
       els.signedOut.style.display = user ? 'none' : 'block';
       els.signedIn.style.display = user ? 'block' : 'none';
       els.email.textContent = user ? (user.email || '') : '';
-      slotsByDate = {};
-      geofenceSubs = {};
+      subsBySpotId = {};
+      spots = [];
+      listings = [];
       if (!user) {
-        subscribeSlots();
-        listings = [];
         renderAll();
+        subscribeSlots();
         return;
       }
       loadListings();
-      subscribeSlots();
-      unsubscribers.push(db.collection('geofence_subscriptions')
+      unsubscribers.push(db.collection('business_subscriptions')
         .where('ownerUid', '==', user.uid)
         .onSnapshot(function (snap) {
-          geofenceSubs = {};
-          snap.forEach(function (doc) { geofenceSubs[doc.id] = doc.data(); });
-          renderGeofence();
-        }, function (err) { console.error('Subscriptions stream error', err); }));
+          subsBySpotId = {};
+          snap.forEach(function (doc) {
+            var d = doc.data();
+            var spotId = d.spotId || (doc.id.indexOf('spots_') === 0 ? doc.id.slice(6) : null);
+            if (spotId) subsBySpotId[spotId] = d;
+          });
+          renderPlans();
+          subscribeSlots();
+        }, function (err) { console.error('Plans stream error', err); }));
     });
 
-    var slotsUnsubscribe = null;
+    function loadListings() {
+      var uid = currentUser.uid;
+      var previousSpot = selectedSpot();
+      var previousListing = selectedListing();
+      return Promise.all([
+        db.collection('spots').where('creator', '==', uid).where('isClaimed', '==', true).get(),
+        db.collection('events').where('creator', '==', uid).get()
+      ]).then(function (results) {
+        spots = [];
+        listings = [];
+        results[0].forEach(function (doc) {
+          var d = doc.data();
+          if (d.isArchived === true) return;
+          var spot = { id: doc.id, collectionPath: 'spots', title: d.title || 'Untitled', businessTier: d.businessTier || null };
+          spots.push(spot);
+          listings.push(spot);
+        });
+        results[1].forEach(function (doc) {
+          var d = doc.data();
+          if (d.isArchived === true) return;
+          listings.push({ id: doc.id, collectionPath: 'events', title: d.title || 'Untitled' });
+        });
+
+        var wantedSpotId = (previousSpot && previousSpot.id) || preselectSpotId;
+        els.spotSelect.innerHTML = '';
+        spots.forEach(function (spot, i) {
+          var option = document.createElement('option');
+          option.value = String(i);
+          option.textContent = spot.title;
+          if (spot.id === wantedSpotId) option.selected = true;
+          els.spotSelect.appendChild(option);
+        });
+        els.listingSelect.innerHTML = '';
+        listings.forEach(function (item, i) {
+          var option = document.createElement('option');
+          option.value = String(i);
+          option.textContent = (item.collectionPath === 'events' ? 'Event: ' : 'Spot: ') + item.title;
+          if (previousListing && previousListing.id === item.id) option.selected = true;
+          els.listingSelect.appendChild(option);
+        });
+        renderAll();
+        subscribeSlots();
+      }).catch(function (err) {
+        console.error('Failed to load listings', err);
+        showBanner('error', 'Could not load your spots and events. Please refresh.');
+      });
+    }
+
+    els.spotSelect.addEventListener('change', renderPlans);
+    els.listingSelect.addEventListener('change', renderCalendar);
+
+    // ---- Plans --------------------------------------------------------------
+    function renderAll() {
+      els.spotSelect.style.display = spots.length > 0 ? '' : 'none';
+      els.noSpots.style.display = currentUser && spots.length === 0 ? 'inline' : 'none';
+      els.listingSelect.style.display = currentUser && listings.length > 0 ? '' : 'none';
+      els.noListings.style.display = currentUser && listings.length === 0 ? 'block' : 'none';
+      renderPlans();
+      renderCalendar();
+    }
+
+    // Returns { label, disabled, action, cancel } for a plan card's buttons.
+    function planButtons(plan) {
+      if (!currentUser) return { label: 'Sign in to continue', action: goSignIn };
+      var spot = selectedSpot();
+      if (!spot) {
+        return plan.tier === 'free'
+          ? { label: 'Claim your spot', action: function () { window.location.href = 'create.html#claim'; } }
+          : { label: 'Claim a spot to get started', disabled: true };
+      }
+      var current = planOf(spot);
+      var isCurrent = current.tier === plan.tier;
+      if (plan.tier === 'free') {
+        if (isCurrent) return { label: 'Current plan', disabled: true };
+        if (current.canceling) return { label: 'Switching to Free at period end', disabled: true };
+        return { label: 'Downgrade to Free', action: function () { cancelPlan(spot, current.tier); } };
+      }
+      if (isCurrent) {
+        if (current.canceling) {
+          return { label: 'Resume ' + plan.name, action: function () { startPlan(spot, plan.tier); } };
+        }
+        return {
+          label: 'Current plan',
+          disabled: true,
+          cancel: { label: 'Cancel ' + plan.name, action: function () { cancelPlan(spot, plan.tier); } }
+        };
+      }
+      if (current.tier === 'pro' && plan.tier === 'starter') {
+        return { label: 'Switch to Starter', action: function () { switchToStarter(spot); } };
+      }
+      if (current.tier === 'starter' && plan.tier === 'pro') {
+        return { label: 'Upgrade to Pro', action: function () { startPlan(spot, 'pro'); } };
+      }
+      return { label: 'Start ' + plan.name, action: function () { startPlan(spot, plan.tier); } };
+    }
+
+    function pillFor(plan) {
+      var spot = selectedSpot();
+      if (!currentUser || !spot) return { text: plan.tier === 'free' ? 'Included' : 'Not active', active: false };
+      var current = planOf(spot);
+      if (current.tier !== plan.tier) return { text: 'Not active', active: false };
+      if (current.canceling && current.periodEnd) {
+        return { text: 'Active until ' + current.periodEnd.toLocaleDateString(), active: true };
+      }
+      return { text: current.beta ? 'Current plan \u00b7 beta' : 'Current plan', active: true };
+    }
+
+    function renderPlans() {
+      els.plansGrid.innerHTML = '';
+      PLANS.forEach(function (plan) {
+        var pill = pillFor(plan);
+        var buttons = planButtons(plan);
+        var card = document.createElement('div');
+        card.className = 'card' + (pill.active ? ' current' : '');
+        card.innerHTML =
+          '<h2 class="card-title">' + escapeHtml(plan.name) + '</h2>' +
+          '<p class="card-subtitle">' + escapeHtml(plan.subtitle) + '</p>' +
+          '<div class="price-tag">' + money(plan.cents, 0) + ' <span class="period">' + escapeHtml(plan.period) + '</span></div>' +
+          '<span class="status-pill' + (pill.active ? ' active' : '') + '">' + escapeHtml(pill.text) + '</span>' +
+          '<ul class="features-list">' + plan.features.map(function (f) {
+            return '<li>' + CHECK_SVG + '<span><strong>' + escapeHtml(f[0]) + '</strong>' +
+              (f[1] ? ' &mdash; ' + escapeHtml(f[1]) : '') + '</span></li>';
+          }).join('') + '</ul>';
+
+        var btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = buttons.label;
+        btn.disabled = busy || !!buttons.disabled;
+        if (buttons.action) btn.addEventListener('click', buttons.action);
+        card.appendChild(btn);
+
+        if (buttons.cancel) {
+          var cancelBtn = document.createElement('button');
+          cancelBtn.className = 'btn secondary';
+          cancelBtn.textContent = buttons.cancel.label;
+          cancelBtn.disabled = busy;
+          cancelBtn.addEventListener('click', buttons.cancel.action);
+          card.appendChild(cancelBtn);
+        }
+
+        var fine = document.createElement('p');
+        fine.className = 'fine-print';
+        fine.textContent = plan.finePrint;
+        card.appendChild(fine);
+        els.plansGrid.appendChild(card);
+      });
+    }
+
+    function setBusy(value) {
+      busy = value;
+      renderPlans();
+    }
+
+    function startPlan(spot, tier) {
+      setBusy(true);
+      runCheckout({ product: tier, targetType: 'spots', targetId: spot.id }).then(function (data) {
+        if (data.status === 'fulfilled') {
+          showBanner('success', spot.title + ' is now on the ' + TIER_NAMES[tier] + ' plan.');
+          return loadListings();
+        }
+      }).catch(function (err) {
+        showBanner('error', 'Could not update the plan: ' + errorMessage(err));
+      }).finally(function () { setBusy(false); });
+    }
+
+    function switchToStarter(spot) {
+      var ok = window.confirm(spot.title + ' moves to Starter (' + money(PRICING.starterMonthlyCents, 0) +
+        '/mo) right away, prorated. Proximity alerts, boost rewards, scheduled specials and event templates turn off.');
+      if (ok) startPlan(spot, 'starter');
+    }
+
+    function cancelPlan(spot, tier) {
+      var ok = window.confirm('Cancel the ' + TIER_NAMES[tier] + ' plan for ' + spot.title +
+        '? Paid perks stay on until the end of the current billing period, then the spot returns to Free.');
+      if (!ok) return;
+      setBusy(true);
+      cancelFeature({ product: tier, targetType: 'spots', targetId: spot.id }).then(function (result) {
+        var data = result.data || {};
+        if (data.status === 'canceling' && data.currentPeriodEnd) {
+          showBanner('info', TIER_NAMES[tier] + ' will end on ' + new Date(data.currentPeriodEnd).toLocaleDateString() + '.');
+        } else {
+          showBanner('info', spot.title + ' is back on the Free plan.');
+        }
+        return loadListings();
+      }).catch(function (err) {
+        showBanner('error', 'Could not cancel: ' + errorMessage(err));
+      }).finally(function () { setBusy(false); });
+    }
+
+    // ---- Citywide blast -----------------------------------------------------
     function subscribeSlots() {
       if (slotsUnsubscribe) slotsUnsubscribe();
       slotsUnsubscribe = null;
       slotsByDate = {};
-      if (!currentUser) return;
-      var ids = calendarDates().map(function (d) { return slotId(dateId(d)); });
+      if (!currentUser) { renderCalendar(); return; }
+      var dates = calendarDates();
+      var FieldPath = firebase.firestore.FieldPath;
       slotsUnsubscribe = db.collection('notification_slots')
-        .where(firebase.firestore.FieldPath.documentId(), 'in', ids)
+        .where(FieldPath.documentId(), '>=', slotId(dateId(dates[0])))
+        .where(FieldPath.documentId(), '<=', slotId(dateId(dates[dates.length - 1])))
         .onSnapshot(function (snap) {
           slotsByDate = {};
-          snap.forEach(function (doc) { slotsByDate[doc.data().date || doc.id] = doc.data(); });
+          snap.forEach(function (doc) { slotsByDate[doc.data().date || doc.id.slice(market.id.length + 1)] = doc.data(); });
           renderCalendar();
         }, function (err) { console.error('Slots stream error', err); });
     }
@@ -672,7 +907,6 @@
       document.getElementById('blast-fine-print').textContent = 'Sent at ' + sendTimeLabel(market.sendHour) +
         ' local time to Varably users around ' + market.name + '. Refundable until the 48h cutoff.';
       subscribeSlots();
-      renderCalendar();
     }
 
     var marketSelect = document.getElementById('market-select');
@@ -692,80 +926,10 @@
       applyMarket(market.id);
     }).catch(function (err) { console.error('Could not load cities', err); });
 
-    function loadListings() {
-      var uid = currentUser.uid;
-      var previous = selectedListing();
-      return Promise.all([
-        db.collection('spots').where('creator', '==', uid).where('isClaimed', '==', true).get(),
-        db.collection('events').where('creator', '==', uid).get()
-      ]).then(function (results) {
-        listings = [];
-        [['spots', results[0]], ['events', results[1]]].forEach(function (pair) {
-          pair[1].forEach(function (doc) {
-            var d = doc.data();
-            if (d.isArchived === true) return;
-            listings.push({ id: doc.id, collectionPath: pair[0], title: d.title || 'Untitled', boost: d.boost || null });
-          });
-        });
-        els.listingSelect.innerHTML = '';
-        listings.forEach(function (item, i) {
-          var option = document.createElement('option');
-          option.value = String(i);
-          option.textContent = (item.collectionPath === 'events' ? 'Event: ' : 'Spot: ') + item.title;
-          if (previous && previous.id === item.id) option.selected = true;
-          els.listingSelect.appendChild(option);
-        });
-        renderAll();
-      }).catch(function (err) {
-        console.error('Failed to load listings', err);
-        showBanner('error', 'Could not load your spots and events. Please refresh.');
-      });
-    }
-
-    els.listingSelect.addEventListener('change', function () {
-      renderGeofence();
-      renderBoost();
-    });
-
-    // ---- Rendering --------------------------------------------------------
-    function renderAll() {
-      var hasListings = listings.length > 0;
-      els.listingSelect.style.display = hasListings ? '' : 'none';
-      els.noListings.style.display = currentUser && !hasListings ? 'inline' : 'none';
-      renderGeofence();
-      renderCalendar();
-      renderBoost();
-    }
-
-    function signedOutLabel(btn) {
-      btn.disabled = false;
-      btn.textContent = 'Sign in to continue';
-    }
-
-    function renderGeofence() {
-      var listing = selectedListing();
-      var sub = listing ? geofenceSubs[listing.collectionPath + '_' + listing.id] : null;
-      var status = sub && sub.status;
-      var active = status === 'active' || status === 'active_beta' || status === 'canceling';
-      els.geofenceStatus.className = 'status-pill' + (active ? ' active' : '');
-      if (!active) {
-        els.geofenceStatus.textContent = 'Not active';
-      } else if (status === 'canceling' && toDate(sub.currentPeriodEnd)) {
-        els.geofenceStatus.textContent = 'Active until ' + toDate(sub.currentPeriodEnd).toLocaleDateString();
-      } else {
-        els.geofenceStatus.textContent = 'Active \u00b7 ' + (sub.deliveredCount || 0) + ' alerts sent';
-      }
-      if (!currentUser) return signedOutLabel(els.btnGeofence);
-      els.btnGeofence.disabled = !listing || (active && status !== 'canceling');
-      els.btnGeofence.textContent = !listing
-        ? 'No listings yet'
-        : status === 'canceling' ? 'Resume Proximity Alerts'
-        : active ? 'Active on this listing' : 'Start Proximity Alerts';
-    }
-
     function renderCalendar() {
       var dates = calendarDates();
       var now = Date.now();
+      els.scheduleTitle.textContent = dates.length + '-Day Schedule';
       els.calendar.innerHTML = '';
       dates.forEach(function (date, index) {
         var id = dateId(date);
@@ -779,7 +943,9 @@
         cell.className = 'day-slot' + (locked ? ' locked' : mine ? ' mine' : taken ? ' booked' : id === selectedDateId ? ' selected' : '');
         var label = locked ? '<48h' : mine ? (slot.status === 'held' ? 'Pending' : 'Yours') : taken ? 'Taken' : money(blastPriceCents(date), 0);
         [['date-label', date.toLocaleDateString(undefined, { weekday: 'short' })],
-         ['date-num', String(date.getDate())],
+         ['date-num', date.getDate() === 1 || index === 0
+            ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+            : String(date.getDate())],
          ['price-label', label]].forEach(function (part) {
           var span = document.createElement('span');
           span.className = part[0];
@@ -796,109 +962,40 @@
         els.calendar.appendChild(cell);
       });
 
+      var selected = selectedDateId && dates.filter(function (d) { return dateId(d) === selectedDateId; })[0];
       if (!currentUser) {
-        var sel = selectedDateId && dates.filter(function (d) { return dateId(d) === selectedDateId; })[0];
         els.btnBlast.disabled = false;
-        els.btnBlast.textContent = sel ? 'Sign in to reserve (' + money(blastPriceCents(sel), 0) + ')' : 'Sign in to continue';
+        els.btnBlast.textContent = selected ? 'Sign in to reserve (' + money(blastPriceCents(selected), 0) + ')' : 'Sign in to continue';
         return;
       }
-      var selected = selectedDateId && dates.filter(function (d) { return dateId(d) === selectedDateId; })[0];
       els.btnBlast.disabled = !selected || !selectedListing();
       els.btnBlast.textContent = selected
         ? 'Reserve Selected Day (' + money(blastPriceCents(selected), 0) + ')'
         : 'Select an available day';
     }
 
-    function renderBoost() {
+    els.btnBlast.addEventListener('click', function () {
+      if (!currentUser) return goSignIn();
       var listing = selectedListing();
-      var boost = listing && listing.boost;
-      var expires = boost && toDate(boost.expiresAt);
-      var boosted = boost && boost.bidCentsPerDay > 0 && expires && expires.getTime() > Date.now();
-      els.boostStatus.className = 'status-pill' + (boosted ? ' active' : '');
-      els.boostStatus.textContent = boosted
-        ? 'Boosted at ' + money(boost.bidCentsPerDay, 2) + '/day until ' + expires.toLocaleDateString()
-        : 'Not boosted';
-
-      var total = Number(els.boostBid.value) * Number(els.boostDays.value);
-      els.boostTotal.textContent = money(total, 2);
-      if (!currentUser) return signedOutLabel(els.btnBoost);
-      els.btnBoost.disabled = !listing;
-      els.btnBoost.textContent = listing ? 'Boost for ' + money(total, 2) : 'No listings yet';
-    }
-
-    PRICING.boostBidTiersCents.forEach(function (cents) {
-      var option = document.createElement('option');
-      option.value = String(cents);
-      option.textContent = money(cents, 2) + ' / day';
-      if (cents === 500) option.selected = true;
-      els.boostBid.appendChild(option);
-    });
-    PRICING.boostDurationDays.forEach(function (days) {
-      var option = document.createElement('option');
-      option.value = String(days);
-      option.textContent = days + ' days';
-      if (days === 7) option.selected = true;
-      els.boostDays.appendChild(option);
-    });
-    els.boostBid.addEventListener('change', renderBoost);
-    els.boostDays.addEventListener('change', renderBoost);
-
-    // ---- Checkout ---------------------------------------------------------
-    function startCheckout(btn, payload, successText) {
-      if (!currentUser) { goSignIn(); return; }
-      var listing = selectedListing();
-      if (!listing) { showBanner('error', 'Pick a spot or event to promote first.'); return; }
-      var label = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Starting secure checkout\u2026';
-      createCheckout(Object.assign({
+      if (!listing || !selectedDateId) return;
+      els.btnBlast.disabled = true;
+      runCheckout({
+        product: 'blast',
+        marketId: market.id,
         targetType: listing.collectionPath,
         targetId: listing.id,
-        returnUrl: window.location.origin + window.location.pathname
-      }, payload)).then(function (result) {
-        var data = result.data || {};
-        if (data.status === 'requires_payment') {
-          // Only ever hand the browser off to Stripe-hosted checkout.
-          if (typeof data.checkoutUrl === 'string' && data.checkoutUrl.indexOf('https://checkout.stripe.com/') === 0) {
-            window.location.assign(data.checkoutUrl);
-            return;
-          }
-          throw new Error('Unexpected checkout response.');
+        date: selectedDateId
+      }).then(function (data) {
+        if (data.status === 'fulfilled') {
+          showBanner('success', 'Citywide blast booked for ' + listing.title + '.');
+          selectedDateId = null;
         }
-        showBanner('success', successText(listing));
-        selectedDateId = null;
-        loadListings();
       }).catch(function (err) {
-        showBanner('error', (err && err.message) || 'Checkout failed. Please try again.');
-      }).finally(function () {
-        btn.textContent = label;
-        renderAll();
-      });
-    }
-
-    els.btnGeofence.addEventListener('click', function () {
-      startCheckout(els.btnGeofence, { product: 'geofence' }, function (l) {
-        return 'Proximity alerts are live for ' + l.title + '.';
-      });
-    });
-    els.btnBlast.addEventListener('click', function () {
-      if (!selectedDateId && currentUser) return;
-      startCheckout(els.btnBlast, { product: 'blast', marketId: market.id, date: selectedDateId }, function (l) {
-        return market.name + ' citywide blast booked for ' + l.title + '.';
-      });
-    });
-    els.btnBoost.addEventListener('click', function () {
-      startCheckout(els.btnBoost, {
-        product: 'boost',
-        bidCentsPerDay: Number(els.boostBid.value),
-        days: Number(els.boostDays.value)
-      }, function (l) {
-        return l.title + ' is boosted for ' + els.boostDays.value + ' days.';
-      });
+        showBanner('error', 'Booking failed: ' + errorMessage(err));
+      }).finally(function () { renderCalendar(); });
     });
 
     renderAll();
   </script>
-
 </body>
 </html>
